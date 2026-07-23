@@ -15,6 +15,9 @@ class MainLayout extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
+          Expanded(
+            child: navigationShell,
+          ),
           CustomTopBar(
             selectedIndex: navigationShell.currentIndex,
             onItemTapped: (index) {
@@ -23,9 +26,6 @@ class MainLayout extends StatelessWidget {
                 initialLocation: index == navigationShell.currentIndex,
               );
             },
-          ),
-          Expanded(
-            child: navigationShell,
           ),
         ],
       ),
