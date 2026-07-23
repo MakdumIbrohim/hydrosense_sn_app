@@ -13,6 +13,12 @@ class AppColors {
   static const Color textPrimary = Color(0xFF212121);
   static const Color textSecondary = Color(0xFF757575);
   
+  static const Color backgroundDark = Color(0xFF121212);
+  static const Color surfaceDark = Color(0xFF1E1E1E);
+  
+  static const Color textPrimaryDark = Color(0xFFE0E0E0);
+  static const Color textSecondaryDark = Color(0xFFAAAAAA);
+  
   static const Color error = Color(0xFFF44336); // Bahaya, pH/EC buruk
   static const Color warning = Color(0xFFFFC107); // Peringatan
   static const Color success = Color(0xFF4CAF50); // Normal/Optimal

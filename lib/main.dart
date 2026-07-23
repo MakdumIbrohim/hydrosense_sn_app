@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:hydrosense_sn_app/core/constants/app_colors.dart';
+import 'package:provider/provider.dart';
 import 'package:hydrosense_sn_app/core/routes/app_router.dart';
+import 'package:hydrosense_sn_app/core/theme/app_theme.dart';
+import 'package:hydrosense_sn_app/core/theme/theme_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,18 +20,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'HydroSense',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          surface: AppColors.primary,
-        ),
-        scaffoldBackgroundColor: AppColors.primary,
-        useMaterial3: true,
-      ),
-      debugShowCheckedModeBanner: false,
-      routerConfig: AppRouter.router,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp.router(
+          title: 'HydroSense',
+          themeMode: themeProvider.themeMode,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          debugShowCheckedModeBanner: false,
+          routerConfig: AppRouter.router,
+        );
+      },
     );
   }
 }
