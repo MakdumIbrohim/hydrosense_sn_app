@@ -1,8 +1,7 @@
-
-
-
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../layout/main_layout.dart';
 import '../../features/devices/presentation/pages/add_device_page.dart';
 import '../../features/devices/presentation/pages/calibrate_page.dart';
 import '../../features/devices/presentation/pages/device_list_page.dart';
@@ -21,25 +20,65 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: AppRoutes.dashboard,
     routes: [
-      GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.settings,
-        builder: (context, state) => const SettingsPage(),
-      ),
-      GoRoute(
-        path: AppRoutes.devices,
-        builder: (context, state) => const DeviceListPage(),
-        routes: [
-          GoRoute(
-            path: 'add',
-            builder: (context, state) => const AddDevicePage(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return MainLayout(navigationShell: navigationShell);
+        },
+        branches: [
+          // 0: Home (Dashboard)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                builder: (context, state) => const DashboardPage(),
+              ),
+            ],
           ),
-          GoRoute(
-            path: ':id/calibrate',
-            builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
+          // 1: Tank (Devices)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.devices,
+                builder: (context, state) => const DeviceListPage(),
+                routes: [
+                  GoRoute(
+                    path: 'add',
+                    builder: (context, state) => const AddDevicePage(),
+                  ),
+                  GoRoute(
+                    path: ':id/calibrate',
+                    builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // 2: Leaf (Plant - Placeholder)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/plant',
+                builder: (context, state) => const Scaffold(body: Center(child: Text('Plant Page'))),
+              ),
+            ],
+          ),
+          // 3: Chart (Analytics - Placeholder)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/analytics',
+                builder: (context, state) => const Scaffold(body: Center(child: Text('Analytics Page'))),
+              ),
+            ],
+          ),
+          // 4: Gear (Settings)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.settings,
+                builder: (context, state) => const SettingsPage(),
+              ),
+            ],
           ),
         ],
       ),
