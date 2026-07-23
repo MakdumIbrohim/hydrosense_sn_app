@@ -7,10 +7,12 @@ import '../../features/devices/presentation/pages/calibrate_page.dart';
 import '../../features/devices/presentation/pages/device_list_page.dart';
 import '../../features/monitoring/presentation/pages/dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/settings/presentation/pages/help_support_page.dart';
 
 class AppRoutes {
   static const String dashboard = '/';
   static const String settings = '/settings';
+  static const String helpSupport = '/settings/help';
   static const String devices = '/devices';
   static const String addDevice = '/devices/add';
   static String calibrateDevice(String id) => '/devices/$id/calibrate';
@@ -59,6 +61,12 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.settings,
                 builder: (context, state) => const SettingsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'help',
+                    builder: (context, state) => const HelpSupportPage(),
+                  ),
+                ],
               ),
             ],
           ),

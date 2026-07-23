@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -62,7 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.help_outline),
             title: const Text('Bantuan & Dukungan'),
-            onTap: () {},
+            onTap: () {
+              context.push(AppRoutes.helpSupport);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.system_update_alt),
