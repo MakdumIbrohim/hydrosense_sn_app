@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AddDevicePage extends StatelessWidget {
   const AddDevicePage({super.key});
@@ -7,13 +6,49 @@ class AddDevicePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Device')),
-      body: Center(
+      appBar: AppBar(title: const Text('Tambah Perangkat')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Pairing WiFi/Bluetooth'),
-            ElevatedButton(onPressed: () => context.go('/devices'), child: const Text('Back to Devices')),
+            const Icon(Icons.bluetooth_searching, size: 80, color: Colors.blue),
+            const SizedBox(height: 24),
+            const Text(
+              'Hubungkan ke ESP32',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Pastikan Bluetooth aktif dan perangkat dalam mode pairing.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            TextField(
+              decoration: const InputDecoration(
+                labelText: 'WiFi SSID (Greenhouse)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.wifi),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'WiFi Password',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {},
+              child: const Padding(
+                padding: EdgeInsets.all(12.0),
+                child: Text('Mulai Pairing & Kirim WiFi', style: TextStyle(fontSize: 16)),
+              ),
+            ),
           ],
         ),
       ),
