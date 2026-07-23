@@ -42,7 +42,7 @@ class CustomTopBar extends StatelessWidget {
               onTap: () => onItemTapped(1),
             ),
             _NavBarItem(
-              icon: Icons.eco_outlined,
+              icon: Icons.dashboard_outlined,
               isSelected: selectedIndex == 2,
               onTap: () => onItemTapped(2),
             ),
