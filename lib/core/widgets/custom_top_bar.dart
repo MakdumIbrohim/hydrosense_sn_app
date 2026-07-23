@@ -33,7 +33,7 @@ class CustomTopBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _NavBarItem(
-              icon: Icons.propane_tank_outlined,
+              icon: Icons.smartphone_outlined,
               isSelected: selectedIndex == 0,
               onTap: () => onItemTapped(0),
             ),
