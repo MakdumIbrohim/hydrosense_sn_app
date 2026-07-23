@@ -14,7 +14,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'HydroSense',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          surface: AppColors.primary,
+        ),
+        scaffoldBackgroundColor: AppColors.primary,
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
