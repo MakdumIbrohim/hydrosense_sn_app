@@ -1,9 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../../core/theme/theme_provider.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  String _version = 'Loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAppVersion();
+  }
+
+  Future<void> _loadAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = 'v${packageInfo.version}';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,21 +57,17 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Tentang Kami'),
-            onTap: () {
-              // TODO: Navigasi ke halaman Tentang Kami
-            },
+            onTap: () {},
           ),
           ListTile(
             leading: const Icon(Icons.help_outline),
             title: const Text('Bantuan & Dukungan'),
-            onTap: () {
-              // TODO: Navigasi ke halaman Bantuan
-            },
+            onTap: () {},
           ),
-          const ListTile(
-            leading: Icon(Icons.system_update_alt),
-            title: Text('Versi Aplikasi'),
-            trailing: Text('v1.0.0', style: TextStyle(color: Colors.grey)),
+          ListTile(
+            leading: const Icon(Icons.system_update_alt),
+            title: const Text('Versi Aplikasi'),
+            trailing: Text(_version, style: const TextStyle(color: Colors.grey)),
           ),
         ],
       ),
