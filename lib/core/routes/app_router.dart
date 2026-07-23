@@ -25,16 +25,7 @@ class AppRouter {
           return MainLayout(navigationShell: navigationShell);
         },
         branches: [
-          // 0: Dashboard
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRoutes.dashboard,
-                builder: (context, state) => const DashboardPage(),
-              ),
-            ],
-          ),
-          // 1: Devices
+          // 0: Devices (Tank Icon)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -53,7 +44,16 @@ class AppRouter {
               ),
             ],
           ),
-          // 2: Settings
+          // 1: Dashboard (Dashboard Icon)
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                builder: (context, state) => const DashboardPage(),
+              ),
+            ],
+          ),
+          // 2: Settings (Gear Icon)
           StatefulShellBranch(
             routes: [
               GoRoute(
