@@ -25,7 +25,7 @@ class AppRouter {
           return MainLayout(navigationShell: navigationShell);
         },
         branches: [
-          // 0: Home (Dashboard)
+          // 0: Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -34,7 +34,7 @@ class AppRouter {
               ),
             ],
           ),
-          // 1: Tank (Devices)
+          // 1: Devices
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -53,25 +53,7 @@ class AppRouter {
               ),
             ],
           ),
-          // 2: Leaf (Plant - Placeholder)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/plant',
-                builder: (context, state) => const Scaffold(body: Center(child: Text('Plant Page'))),
-              ),
-            ],
-          ),
-          // 3: Chart (Analytics - Placeholder)
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: '/analytics',
-                builder: (context, state) => const Scaffold(body: Center(child: Text('Analytics Page'))),
-              ),
-            ],
-          ),
-          // 4: Gear (Settings)
+          // 2: Settings
           StatefulShellBranch(
             routes: [
               GoRoute(

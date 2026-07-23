@@ -13,7 +13,7 @@ class DashboardPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Dashboard Page'),
+            const Text('LA DEYYEH GELLUN'),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => context.go(AppRoutes.settings),

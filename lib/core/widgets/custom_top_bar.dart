@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
 
 class CustomTopBar extends StatelessWidget {
   final int selectedIndex;
@@ -32,29 +33,19 @@ class CustomTopBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _NavBarItem(
-              icon: Icons.home_outlined,
+              icon: Icons.propane_tank_outlined,
               isSelected: selectedIndex == 0,
               onTap: () => onItemTapped(0),
             ),
             _NavBarItem(
-              icon: Icons.propane_tank_outlined,
+              icon: Icons.dashboard_outlined,
               isSelected: selectedIndex == 1,
               onTap: () => onItemTapped(1),
             ),
             _NavBarItem(
-              icon: Icons.dashboard_outlined,
+              icon: Icons.settings_outlined,
               isSelected: selectedIndex == 2,
               onTap: () => onItemTapped(2),
-            ),
-            _NavBarItem(
-              icon: Icons.analytics_outlined,
-              isSelected: selectedIndex == 3,
-              onTap: () => onItemTapped(3),
-            ),
-            _NavBarItem(
-              icon: Icons.settings_outlined,
-              isSelected: selectedIndex == 4,
-              onTap: () => onItemTapped(4),
             ),
           ],
         ),
@@ -83,12 +74,12 @@ class _NavBarItem extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFC5FF29) : Colors.transparent,
+          color: isSelected ? AppColors.primary : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          color: Colors.black87,
+          color: isSelected ? Colors.white : Colors.black87,
           size: 24.0,
         ),
       ),
