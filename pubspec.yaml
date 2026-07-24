@@ -40,6 +40,7 @@ dependencies:
   fl_chart: ^1.2.0
   intl: ^0.20.3
   mqtt_client: ^10.11.11
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:
