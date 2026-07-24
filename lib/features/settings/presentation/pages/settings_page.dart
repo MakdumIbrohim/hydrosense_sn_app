@@ -42,9 +42,9 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Text('Tampilan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
           SwitchListTile(
-            secondary: const Icon(Icons.dark_mode_outlined),
-            title: const Text('Mode Gelap'),
-            subtitle: const Text('Ubah tema menjadi gelap'),
+            secondary: Icon(themeProvider.isDarkMode ? Icons.dark_mode_outlined : Icons.light_mode_outlined),
+            title: Text(themeProvider.isDarkMode ? 'Tema Gelap' : 'Tema Terang'),
+            subtitle: Text(themeProvider.isDarkMode ? 'Ubah tema menjadi terang' : 'Ubah tema menjadi gelap'),
             value: themeProvider.isDarkMode,
             onChanged: (value) {
               final provider = Provider.of<ThemeProvider>(context, listen: false);
