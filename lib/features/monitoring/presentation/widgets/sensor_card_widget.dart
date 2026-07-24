@@ -21,8 +21,12 @@ class SensorCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 0, // Dibuat 0 agar flat color lebih menyatu
+      color: iconColor.withValues(alpha: 0.15), // Background pudar sesuai warna icon
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: iconColor.withValues(alpha: 0.3), width: 1), // Beri border tipis
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
