@@ -6,6 +6,7 @@ class SensorCardWidget extends StatelessWidget {
   final String unit;
   final IconData icon;
   final Color statusColor;
+  final Color iconColor;
 
   const SensorCardWidget({
     super.key,
@@ -14,6 +15,7 @@ class SensorCardWidget extends StatelessWidget {
     required this.unit,
     required this.icon,
     required this.statusColor,
+    required this.iconColor,
   });
 
   @override
@@ -28,7 +30,7 @@ class SensorCardWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, color: statusColor, size: 24),
+                Icon(icon, color: iconColor, size: 24),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -49,7 +51,7 @@ class SensorCardWidget extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: statusColor,
+                    color: statusColor, // Teks nilai tetap warna status (hijau/kuning/merah)
                   ),
                 ),
                 const SizedBox(width: 4),
