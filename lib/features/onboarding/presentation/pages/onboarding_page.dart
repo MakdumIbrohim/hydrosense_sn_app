@@ -9,63 +9,120 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.water_drop,
-                size: 100,
-                color: AppColors.primary,
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                'Selamat Datang di HydroSense',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Monitoring kualitas air dan nutrisi hidroponik Anda secara real-time dan mudah.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.go(AppRoutes.dashboard);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                  ),
-                  child: const Text(
-                    'Mulai Sekarang',
+      backgroundColor: AppColors.primaryLight.withValues(alpha: 0.3), // Background atas lebih terang
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Monitoring\nPintar Untuk\nHidroponik',
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      fontSize: 36,
+                      height: 1.2,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.primaryDark,
                     ),
                   ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Dengan bantuan sistem cerdas kami, dapatkan hasil panen terbaik untuk tanaman Anda.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.primaryDark,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Ilustrasi Daun/Tanaman
+            Expanded(
+              child: Center(
+                child: Icon(
+                  Icons.eco_outlined,
+                  size: 200,
+                  color: AppColors.primaryDark.withValues(alpha: 0.2), // Icon line-art transparan
                 ),
               ),
-            ],
-          ),
+            ),
+
+            // Card Bawah
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(32.0),
+              decoration: const BoxDecoration(
+                color: AppColors.primary, // Warna utama
+                borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
+              ),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Buat kebun Anda\nlebih baik dari\nsebelumnya',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    
+                    // Tombol Get Started
+                    InkWell(
+                      onTap: () => context.go(AppRoutes.dashboard),
+                      borderRadius: BorderRadius.circular(30),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 16.0),
+                                child: Text(
+                                  'Mulai Sekarang',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: const BoxDecoration(
+                                color: AppColors.primaryLight,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.arrow_forward,
+                                color: Colors.black87,
+                                size: 20,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
