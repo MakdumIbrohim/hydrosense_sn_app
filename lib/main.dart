@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:hydrosense_sn_app/core/routes/app_router.dart';
 import 'package:hydrosense_sn_app/core/theme/app_theme.dart';
 import 'package:hydrosense_sn_app/core/theme/theme_provider.dart';
+import 'package:hydrosense_sn_app/features/monitoring/presentation/providers/sensor_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => SensorProvider()),
       ],
       child: const MyApp(),
     ),
