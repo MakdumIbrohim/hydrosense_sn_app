@@ -15,39 +15,44 @@ class CustomTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       bottom: false,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: AppColors.primary,
-          borderRadius: BorderRadius.circular(40.0),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400), // Batasi lebar di desktop
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(40.0),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _NavBarItem(
-              icon: Icons.smartphone_outlined,
-              isSelected: selectedIndex == 0,
-              onTap: () => onItemTapped(0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavBarItem(
+                  icon: Icons.smartphone_outlined,
+                  isSelected: selectedIndex == 0,
+                  onTap: () => onItemTapped(0),
+                ),
+                _NavBarItem(
+                  icon: Icons.dashboard_outlined,
+                  isSelected: selectedIndex == 1,
+                  onTap: () => onItemTapped(1),
+                ),
+                _NavBarItem(
+                  icon: Icons.settings_outlined,
+                  isSelected: selectedIndex == 2,
+                  onTap: () => onItemTapped(2),
+                ),
+              ],
             ),
-            _NavBarItem(
-              icon: Icons.dashboard_outlined,
-              isSelected: selectedIndex == 1,
-              onTap: () => onItemTapped(1),
-            ),
-            _NavBarItem(
-              icon: Icons.settings_outlined,
-              isSelected: selectedIndex == 2,
-              onTap: () => onItemTapped(2),
-            ),
-          ],
+          ),
         ),
       ),
     );
