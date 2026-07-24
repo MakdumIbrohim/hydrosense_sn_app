@@ -1,4 +1,3 @@
-
 import 'package:go_router/go_router.dart';
 
 import '../layout/main_layout.dart';
@@ -8,8 +7,10 @@ import '../../features/devices/presentation/pages/device_list_page.dart';
 import '../../features/monitoring/presentation/pages/dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
+import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 
 class AppRoutes {
+  static const String onboarding = '/onboarding';
   static const String dashboard = '/';
   static const String settings = '/settings';
   static const String helpSupport = '/settings/help';
@@ -20,8 +21,12 @@ class AppRoutes {
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: AppRoutes.dashboard,
+    initialLocation: AppRoutes.onboarding,
     routes: [
+      GoRoute(
+        path: AppRoutes.onboarding,
+        builder: (context, state) => const OnboardingPage(),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainLayout(navigationShell: navigationShell);
