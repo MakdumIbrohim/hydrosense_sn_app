@@ -59,7 +59,7 @@ class _WifiSetupScreenState extends State<WifiSetupScreen> {
     });
 
     try {
-      await _targetDevice!.connect();
+      await _targetDevice!.connect(license: License.nonprofit);
       
       List<BluetoothService> services = await _targetDevice!.discoverServices();
       for (BluetoothService service in services) {
