@@ -125,8 +125,8 @@ class DashboardPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // 4. Grafik Tren
-                  const ChartWidget(),
+                  // 4. Grafik Tren Real-Time
+                  ChartWidget(history: provider.ecHistory),
                   const SizedBox(height: 32), // Padding bottom
                 ],
               ),

@@ -7,6 +7,7 @@ import '../../domain/entities/sensor_data.dart';
 class SensorProvider extends ChangeNotifier {
   SensorData? _currentData;
   bool _isLoading = true;
+  final List<double> _ecHistory = [];
   Timer? _pollingTimer;
   final HttpClient _httpClient = HttpClient();
 
@@ -15,6 +16,7 @@ class SensorProvider extends ChangeNotifier {
 
   SensorData? get currentData => _currentData;
   bool get isLoading => _isLoading;
+  List<double> get ecHistory => _ecHistory;
 
   SensorProvider() {
     _initFirebasePolling();
@@ -32,7 +34,9 @@ class SensorProvider extends ChangeNotifier {
 
   Future<void> _fetchDataFromFirebase() async {
     try {
-      final request = await _httpClient.getUrl(Uri.parse(_firebaseUrl));
+      // Tambahkan parameter acak (cache-buster) agar HTTP tidak menggunakan data lama
+      final url = Uri.parse("$_firebaseUrl?_=${DateTime.now().millisecondsSinceEpoch}");
+      final request = await _httpClient.getUrl(url);
       final response = await request.close();
       
       if (response.statusCode == 200) {
@@ -44,13 +48,19 @@ class SensorProvider extends ChangeNotifier {
             ph: (data['ph'] ?? 0.0).toDouble(),
             tds: (data['tds'] ?? 0.0).toDouble(),
             ec: (data['ec'] ?? 0.0).toDouble(),
-            waterTemperature: (data['temperature'] ?? 0.0).toDouble(), // Sesuai JSON Firebase
-            waterVolume: 0.0, // Dihapus dari alat
+            waterTemperature: (data['temperature'] ?? 0.0).toDouble(),
+            waterVolume: 0.0,
             npk: NpkData(nitrogen: 0, phosphorus: 0, potassium: 0),
             timestamp: data['timestamp'] != null 
                 ? DateTime.fromMillisecondsSinceEpoch(data['timestamp'])
                 : DateTime.now(),
           );
+          
+          // Tambahkan histori untuk grafik (maks 20 data agar tidak kepenuhan RAM)
+          if (_ecHistory.length >= 20) {
+            _ecHistory.removeAt(0); // Buang yang paling lama
+          }
+          _ecHistory.add(_currentData!.ec);
           
           _isLoading = false;
           notifyListeners();

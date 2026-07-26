@@ -3,10 +3,22 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class ChartWidget extends StatelessWidget {
-  const ChartWidget({super.key});
+  final List<double> history;
+  
+  const ChartWidget({super.key, required this.history});
 
   @override
   Widget build(BuildContext context) {
+    // Buat data default jika histori masih kosong atau terlalu sedikit
+    List<FlSpot> spots = [];
+    if (history.isEmpty) {
+      spots = const [FlSpot(0, 0)];
+    } else {
+      for (int i = 0; i < history.length; i++) {
+        spots.add(FlSpot(i.toDouble(), history[i]));
+      }
+    }
+
     return Card(
       elevation: 0,
       color: AppColors.primary.withValues(alpha: 0.10), // Tint warna primary pudar
@@ -20,7 +32,7 @@ class ChartWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Tren EC (24 Jam Terakhir)',
+              'Tren EC (Real-Time)',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 16),
@@ -32,6 +44,7 @@ class ChartWidget extends StatelessWidget {
                   titlesData: const FlTitlesData(
                     rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                     topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), // Sembunyikan sumbu X agar lebih rapi
                   ),
                   borderData: FlBorderData(show: false),
                   lineTouchData: LineTouchData(
@@ -40,7 +53,7 @@ class ChartWidget extends StatelessWidget {
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((touchedSpot) {
                           return LineTooltipItem(
-                            touchedSpot.y.toString(),
+                            touchedSpot.y.toStringAsFixed(2),
                             const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           );
                         }).toList();
@@ -49,15 +62,7 @@ class ChartWidget extends StatelessWidget {
                   ),
                   lineBarsData: [
                     LineChartBarData(
-                      spots: const [
-                        FlSpot(0, 1.2),
-                        FlSpot(4, 1.3),
-                        FlSpot(8, 1.25),
-                        FlSpot(12, 1.4),
-                        FlSpot(16, 1.35),
-                        FlSpot(20, 1.5),
-                        FlSpot(24, 1.4),
-                      ],
+                      spots: spots,
                       isCurved: true,
                       color: AppColors.primary,
                       barWidth: 3,
