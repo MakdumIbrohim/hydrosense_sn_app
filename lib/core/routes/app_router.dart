@@ -8,12 +8,14 @@ import '../../features/monitoring/presentation/pages/dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/wifi_setup_screen.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String dashboard = '/';
   static const String settings = '/settings';
   static const String helpSupport = '/settings/help';
+  static const String wifiSetup = '/settings/wifi-setup';
   static const String devices = '/devices';
   static const String addDevice = '/devices/add';
   static String calibrateDevice(String id) => '/devices/$id/calibrate';
@@ -70,6 +72,10 @@ class AppRouter {
                   GoRoute(
                     path: 'help',
                     builder: (context, state) => const HelpSupportPage(),
+                  ),
+                  GoRoute(
+                    path: 'wifi-setup',
+                    builder: (context, state) => const WifiSetupScreen(),
                   ),
                 ],
               ),

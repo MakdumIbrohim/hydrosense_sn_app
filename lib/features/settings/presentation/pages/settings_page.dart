@@ -54,6 +54,19 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Text('Perangkat', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+          ),
+          ListTile(
+            leading: const Icon(Icons.wifi_find),
+            title: const Text('Setup WiFi ESP32'),
+            subtitle: const Text('Ubah WiFi alat via Bluetooth'),
+            onTap: () {
+              context.push(AppRoutes.wifiSetup);
+            },
+          ),
+          const Divider(),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Text('Informasi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
           ListTile(
