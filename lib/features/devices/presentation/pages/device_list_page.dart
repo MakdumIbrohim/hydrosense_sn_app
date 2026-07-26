@@ -9,62 +9,83 @@ class DeviceListPage extends StatelessWidget {
     final TextEditingController pinController = TextEditingController();
     bool isError = false;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Row(
-                children: [
-                  Icon(Icons.lock, color: Color(0xFF0D6E6E)),
-                  SizedBox(width: 8),
-                  Text('Keamanan Admin', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
+            return Container(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Masukkan PIN untuk membuka halaman konfigurasi jaringan ESP32.'),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: pinController,
-                    obscureText: true,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'PIN Admin',
-                      border: const OutlineInputBorder(),
-                      errorText: isError ? 'PIN salah! Coba lagi.' : null,
-                      prefixIcon: const Icon(Icons.password),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10))),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(color: const Color(0xFFFB923C).withValues(alpha: 0.15), shape: BoxShape.circle),
+                          child: const Icon(Icons.lock_rounded, color: Color(0xFFFB923C)),
+                        ),
+                        const SizedBox(width: 16),
+                        Text('Keamanan Admin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text('Masukkan PIN untuk menambah atau mengonfigurasi perangkat.', style: TextStyle(color: Colors.grey.shade500)),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: pinController,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(fontSize: 20, letterSpacing: 8, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                        errorText: isError ? 'PIN salah! Coba lagi.' : null,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF38BDF8),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: () {
+                          if (pinController.text == '123456') {
+                            Navigator.pop(context);
+                            context.go(AppRoutes.addDevice);
+                          } else {
+                            setState(() => isError = true);
+                          }
+                        },
+                        child: const Text('MASUK', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D6E6E), 
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () {
-                    // PIN Rahasia (Ubah sesuai keinginan Anda)
-                    if (pinController.text == '123456') {
-                      Navigator.pop(context); // Tutup pop-up
-                      context.go(AppRoutes.addDevice); // Buka halaman setup WiFi
-                    } else {
-                      setState(() {
-                        isError = true;
-                      });
-                    }
-                  },
-                  child: const Text('Masuk'),
-                ),
-              ],
             );
           }
         );
@@ -165,52 +186,55 @@ class DeviceListPage extends StatelessWidget {
         ],
         border: Border.all(color: isOnline ? (isDark ? Colors.transparent : Colors.green.withValues(alpha: 0.3)) : Colors.transparent),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        leading: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isOnline ? const Color(0xFF34D399).withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            Icons.memory_rounded, 
-            color: isOnline ? const Color(0xFF34D399) : Colors.grey,
-            size: 28,
-          ),
-        ),
-        title: Text(
-          title, 
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
-        ),
-        subtitle: Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: isOnline ? const Color(0xFF34D399) : Colors.grey,
-                shape: BoxShape.circle,
-                boxShadow: isOnline ? [const BoxShadow(color: Color(0xFF34D399), blurRadius: 4)] : [],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              isOnline ? 'Online' : 'Offline', 
-              style: TextStyle(color: isOnline ? const Color(0xFF34D399) : Colors.grey),
-            ),
-          ],
-        ),
-        trailing: InkWell(
-          onTap: onCalibrate,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.all(10),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          leading: Container(
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              color: isOnline ? const Color(0xFF34D399).withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.tune_rounded, color: Color(0xFF38BDF8)),
+            child: Icon(
+              Icons.memory_rounded, 
+              color: isOnline ? const Color(0xFF34D399) : Colors.grey,
+              size: 28,
+            ),
+          ),
+          title: Text(
+            title, 
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+          ),
+          subtitle: Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: isOnline ? const Color(0xFF34D399) : Colors.grey,
+                  shape: BoxShape.circle,
+                  boxShadow: isOnline ? [const BoxShadow(color: Color(0xFF34D399), blurRadius: 4)] : [],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isOnline ? 'Online' : 'Offline', 
+                style: TextStyle(color: isOnline ? const Color(0xFF34D399) : Colors.grey),
+              ),
+            ],
+          ),
+          trailing: InkWell(
+            onTap: onCalibrate,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.tune_rounded, color: Color(0xFF38BDF8)),
+            ),
           ),
         ),
       ),

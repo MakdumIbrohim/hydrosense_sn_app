@@ -161,139 +161,202 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Scaffold(
-      appBar: AppBar(title: const Text('Tambah Perangkat')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Info Box
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withOpacity(0.3)),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // HEADER
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Text(
+                    'Tambah Perangkat',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B), letterSpacing: -0.5),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Info: Masukkan WiFi rumah, lakukan Scan, lalu tekan tombol "Kirim" pada alat yang bernama HydroSense_V2 di daftar.',
-                textAlign: TextAlign.justify,
-                style: TextStyle(fontSize: 13),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Inputs
-            TextField(
-              controller: _ssidController,
-              decoration: const InputDecoration(
-                labelText: 'Nama WiFi SSID (Rumah/Greenhouse)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.wifi),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _passController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password WiFi',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            // Tombol Scan & Status
-            ElevatedButton.icon(
-              onPressed: _isScanning || _isConnecting ? null : _startScan,
-              icon: _isScanning 
-                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                : const Icon(Icons.bluetooth_searching),
-              label: Text(_isScanning ? 'Mencari...' : 'Cari Perangkat Bluetooth'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0D6E6E),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-            ),
-            
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Text(
-                _status,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: _status.contains('Gagal') ? Colors.red : 
-                         _status.contains('Terkirim') ? Colors.green : 
-                         (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+              const SizedBox(height: 32),
+
+              // Info Box
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline_rounded, color: Color(0xFF38BDF8)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Masukkan WiFi rumah, lakukan Scan, lalu tekan "Kirim" pada alat bernama HydroSense_V2.',
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade100 : Colors.blue.shade900),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const Divider(),
-            
-            // Daftar Perangkat
-            _scanResults.isEmpty 
-              ? const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Center(child: Text("Belum ada perangkat ditemukan.", style: TextStyle(color: Colors.grey))),
-                )
-              : ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _scanResults.length,
-                  itemBuilder: (context, index) {
-                    final r = _scanResults[index];
-                    final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
-                    final isTarget = deviceName == "HydroSense_V2";
-                    final isDark = Theme.of(context).brightness == Brightness.dark;
-                    
-                    return Card(
-                      elevation: isTarget ? 6 : 2,
-                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: isTarget 
-                            ? const BorderSide(color: Color(0xFF0D6E6E), width: 2) 
-                            : BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
-                      ),
-                      color: isTarget ? (isDark ? const Color(0xFF004D40) : const Color(0xFFE0F2F1)) : null,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                        leading: CircleAvatar(
-                          backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
-                          child: Icon(Icons.bluetooth, color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : Colors.grey),
-                        ),
-                        title: Text(
-                          deviceName, 
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : null,
-                            fontSize: 16,
-                          )
-                        ),
-                        subtitle: Text(
-                          r.device.remoteId.toString(), 
-                          style: const TextStyle(fontSize: 11, color: Colors.grey)
-                        ),
-                        trailing: ElevatedButton(
-                          onPressed: _isConnecting ? null : () => _sendData(r.device),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isTarget ? const Color(0xFF0D6E6E) : Colors.blue.shade600, 
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                            elevation: isTarget ? 4 : 0,
+              const SizedBox(height: 24),
+              
+              // Inputs
+              Text('KONEKSI ALAT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _ssidController,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  labelText: 'Nama WiFi SSID',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.wifi_rounded, color: Colors.grey),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passController,
+                obscureText: true,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                decoration: InputDecoration(
+                  labelText: 'Password WiFi',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                  prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
+                ),
+              ),
+              const SizedBox(height: 24),
+              
+              // Tombol Scan
+              Container(
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    if (!_isScanning && !_isConnecting)
+                      BoxShadow(color: const Color(0xFF34D399).withValues(alpha: 0.3), blurRadius: 16, spreadRadius: 2, offset: const Offset(0, 4)),
+                  ],
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: _isScanning || _isConnecting ? null : _startScan,
+                  icon: _isScanning 
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                    : const Icon(Icons.bluetooth_searching_rounded),
+                  label: Text(_isScanning ? 'MENCARI...' : 'CARI PERANGKAT BLUETOOTH', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF34D399),
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade300,
+                    disabledForegroundColor: Colors.grey.shade500,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                child: Text(
+                  _status,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: _status.contains('Gagal') ? const Color(0xFFF43F5E) : 
+                           _status.contains('Terkirim') ? const Color(0xFF34D399) : 
+                           (isDark ? Colors.white70 : Colors.black87),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
+              
+              if (_scanResults.isNotEmpty) ...[
+                Text('HASIL SCAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
+                const SizedBox(height: 12),
+              ],
+              
+              // Daftar Perangkat
+              _scanResults.isEmpty 
+                ? const Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Center(child: Text("Belum ada perangkat ditemukan.", style: TextStyle(color: Colors.grey))),
+                  )
+                : ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _scanResults.length,
+                    itemBuilder: (context, index) {
+                      final r = _scanResults[index];
+                      final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
+                      final isTarget = deviceName == "HydroSense_V2";
+                      
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: isTarget 
+                              ? (isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.1) : const Color(0xFF38BDF8).withValues(alpha: 0.05)) 
+                              : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isTarget ? const Color(0xFF38BDF8) : Colors.transparent,
+                            width: 1.5
                           ),
-                          child: Text(isTarget ? 'Pilih & Kirim' : 'Kirim'),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
-                      ),
-                    );
-                  },
-                ),
-          ],
+                        child: Material(
+                          color: Colors.transparent,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isTarget ? const Color(0xFF38BDF8).withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.bluetooth_rounded, color: isTarget ? const Color(0xFF38BDF8) : Colors.grey),
+                            ),
+                            title: Text(
+                              deviceName, 
+                              style: TextStyle(fontWeight: FontWeight.bold, color: isTarget ? const Color(0xFF38BDF8) : (isDark ? Colors.white : const Color(0xFF1E293B)), fontSize: 16)
+                            ),
+                            subtitle: Text(r.device.remoteId.toString(), style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                            trailing: ElevatedButton(
+                              onPressed: _isConnecting ? null : () => _sendData(r.device),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isTarget ? const Color(0xFF38BDF8) : (isDark ? const Color(0xFF334155) : Colors.blue.shade100), 
+                                foregroundColor: isTarget ? Colors.white : (isDark ? Colors.white : Colors.blue.shade700),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text(isTarget ? 'KIRIM' : 'PILIH', style: const TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+            ],
+          ),
         ),
       ),
     );
