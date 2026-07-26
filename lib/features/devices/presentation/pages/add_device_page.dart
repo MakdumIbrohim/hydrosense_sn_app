@@ -35,6 +35,23 @@ class _AddDevicePageState extends State<AddDevicePage> {
   }
 
   void _startScan() async {
+    // 1. Cek izin dan perangkat keras
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.location,
+    ].request();
+
+    if (statuses[Permission.location] != PermissionStatus.granted) {
+      setState(() => _status = "Gagal: Izin Lokasi (GPS) wajib diberikan untuk scan!");
+      return;
+    }
+
+    if (await FlutterBluePlus.adapterState.first != BluetoothAdapterState.on) {
+      setState(() => _status = "Gagal: Tolong NYALAKAN BLUETOOTH di HP Anda!");
+      return;
+    }
+
     setState(() {
       _isScanning = true;
       _scanResults = [];
