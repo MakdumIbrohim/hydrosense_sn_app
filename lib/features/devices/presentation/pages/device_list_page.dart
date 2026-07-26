@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../monitoring/presentation/providers/sensor_provider.dart';
 
 class DeviceListPage extends StatelessWidget {
   const DeviceListPage({super.key});
@@ -117,25 +119,28 @@ class DeviceListPage extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               Expanded(
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    _buildDeviceTile(
-                      isDark: isDark,
-                      cardColor: cardColor,
-                      title: 'ESP32 Area Barat',
-                      isOnline: true,
-                      onCalibrate: () => context.go(AppRoutes.calibrateDevice('esp32-barat')),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildDeviceTile(
-                      isDark: isDark,
-                      cardColor: cardColor,
-                      title: 'ESP32 Tandon Utama',
-                      isOnline: false,
-                      onCalibrate: () => context.go(AppRoutes.calibrateDevice('esp32-tandon')),
-                    ),
-                  ],
+                child: Consumer<SensorProvider>(
+                  builder: (context, provider, child) {
+                    final data = provider.currentData;
+                    // Anggap online jika data Firebase ditarik kurang dari 2 menit yang lalu
+                    bool isOnline = false;
+                    if (data != null) {
+                      isOnline = DateTime.now().difference(data.timestamp).inMinutes < 2;
+                    }
+
+                    return ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        _buildDeviceTile(
+                          isDark: isDark,
+                          cardColor: cardColor,
+                          title: 'HydroSense Node 1',
+                          isOnline: isOnline,
+                          onCalibrate: () => context.go(AppRoutes.calibrateDevice('esp32-node-1')),
+                        ),
+                      ],
+                    );
+                  }
                 ),
               ),
             ],
