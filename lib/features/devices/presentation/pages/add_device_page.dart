@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -79,6 +80,11 @@ class _AddDevicePageState extends State<AddDevicePage> {
     try {
       // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
       await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
+      
+      // Minta kapasitas pengiriman data yang lebih besar (MTU) karena SSID + Pass bisa > 20 huruf
+      if (Platform.isAndroid) {
+        await device.requestMtu(256);
+      }
       await Future.delayed(const Duration(milliseconds: 1000)); // Beri waktu stabil
       
       List<BluetoothService> services = await device.discoverServices();
