@@ -77,12 +77,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
     });
 
     try {
-      // Putuskan koneksi lama (jika nyangkut) agar tidak error 'Bad state'
-      await device.disconnect();
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      await device.connect(license: License.nonprofit);
-      await Future.delayed(const Duration(milliseconds: 500)); // Beri waktu stabil
+      // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
+      await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
+      await Future.delayed(const Duration(milliseconds: 1000)); // Beri waktu stabil
       
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
