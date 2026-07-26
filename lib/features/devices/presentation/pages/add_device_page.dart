@@ -178,7 +178,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _status.contains('Gagal') ? Colors.red : 
-                         _status.contains('Berhasil') ? Colors.green : Colors.black87,
+                         _status.contains('Berhasil') ? Colors.green : 
+                         (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -195,6 +196,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     itemBuilder: (context, index) {
                       final r = _scanResults[index];
                       final isTarget = r.device.platformName == "HydroSense_Setup";
+                      final isDark = Theme.of(context).brightness == Brightness.dark;
                       
                       return Card(
                         elevation: isTarget ? 6 : 2,
@@ -203,20 +205,20 @@ class _AddDevicePageState extends State<AddDevicePage> {
                           borderRadius: BorderRadius.circular(12),
                           side: isTarget 
                               ? const BorderSide(color: Color(0xFF0D6E6E), width: 2) 
-                              : BorderSide(color: Colors.grey.shade300, width: 1),
+                              : BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
                         ),
-                        color: isTarget ? const Color(0xFFE0F2F1) : Colors.white,
+                        color: isTarget ? (isDark ? const Color(0xFF004D40) : const Color(0xFFE0F2F1)) : null,
                         child: ListTile(
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           leading: CircleAvatar(
-                            backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.shade100,
-                            child: Icon(Icons.bluetooth, color: isTarget ? const Color(0xFF0D6E6E) : Colors.grey.shade600),
+                            backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                            child: Icon(Icons.bluetooth, color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : Colors.grey),
                           ),
                           title: Text(
                             r.device.platformName, 
                             style: TextStyle(
                               fontWeight: FontWeight.bold, 
-                              color: isTarget ? const Color(0xFF0D6E6E) : Colors.black87,
+                              color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : null,
                               fontSize: 16,
                             )
                           ),
