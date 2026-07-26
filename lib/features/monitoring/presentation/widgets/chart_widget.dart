@@ -9,6 +9,9 @@ class ChartWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+
     // Buat data default jika histori masih kosong atau terlalu sedikit
     List<FlSpot> spots = [];
     if (history.isEmpty) {
@@ -19,42 +22,70 @@ class ChartWidget extends StatelessWidget {
       }
     }
 
-    return Card(
-      elevation: 0,
-      color: AppColors.primary.withValues(alpha: 0.10), // Tint warna primary pudar
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3), width: 1),
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Tren EC (Real-Time)',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: const Color(0xFF34D399).withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.show_chart_rounded, color: Color(0xFF34D399)),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Tren Nutrisi (EC)',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             SizedBox(
               height: 200,
               child: LineChart(
                 LineChartData(
-                  gridData: const FlGridData(show: false),
-                  titlesData: const FlTitlesData(
-                    rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), // Sembunyikan sumbu X agar lebih rapi
+                  gridData: FlGridData(
+                    show: true,
+                    drawVerticalLine: false,
+                    horizontalInterval: 1,
+                    getDrawingHorizontalLine: (value) => FlLine(
+                      color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
+                      strokeWidth: 1,
+                      dashArray: [5, 5],
+                    ),
+                  ),
+                  titlesData: FlTitlesData(
+                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), // Sembunyikan sumbu X agar lebih rapi
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 30,
+                        getTitlesWidget: (value, meta) => Text(
+                          value.toInt().toString(),
+                          style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 10),
+                        ),
+                      ),
+                    ),
                   ),
                   borderData: FlBorderData(show: false),
                   lineTouchData: LineTouchData(
                     touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (touchedSpot) => AppColors.primary,
+                      getTooltipColor: (touchedSpot) => const Color(0xFF1E293B),
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((touchedSpot) {
                           return LineTooltipItem(
-                            touchedSpot.y.toStringAsFixed(2),
-                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            '${touchedSpot.y.toStringAsFixed(2)} mS',
+                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                           );
                         }).toList();
                       },
@@ -64,12 +95,22 @@ class ChartWidget extends StatelessWidget {
                     LineChartBarData(
                       spots: spots,
                       isCurved: true,
-                      color: AppColors.primary,
-                      barWidth: 3,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF38BDF8), Color(0xFF34D399)],
+                      ),
+                      barWidth: 4,
+                      isStrokeCapRound: true,
                       dotData: const FlDotData(show: false),
                       belowBarData: BarAreaData(
                         show: true,
-                        color: AppColors.primary.withValues(alpha: 0.2),
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF38BDF8).withValues(alpha: 0.2),
+                            const Color(0xFF34D399).withValues(alpha: 0.0),
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                        ),
                       ),
                     ),
                   ],

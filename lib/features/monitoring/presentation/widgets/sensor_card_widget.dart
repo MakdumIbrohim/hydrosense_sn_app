@@ -27,25 +27,23 @@ class SensorCardWidget extends StatelessWidget {
     if (percent > 1) percent = 1;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF1E1E1E) : Colors.white;
-    final trackColor = isDark ? const Color(0xFF2C2C2E) : Colors.grey.withValues(alpha: 0.2);
-    final borderColor = isDark ? Colors.transparent : Colors.grey.withValues(alpha: 0.2);
+    final bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final trackColor = isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15);
 
-    return Card(
-      elevation: isDark ? 4 : 1,
-      color: bgColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: borderColor, width: 1),
+    return Container(
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title.toUpperCase(),
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.grey : Colors.grey.shade600, letterSpacing: 1),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade400 : Colors.grey.shade500, letterSpacing: 1.2),
             ),
             const Spacer(),
             Center(
@@ -60,11 +58,11 @@ class SensorCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           value,
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color),
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                         ),
                         Text(
                           unit,
-                          style: TextStyle(fontSize: 10, color: color.withValues(alpha: 0.8)),
+                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                         ),
                       ],
                     ),
@@ -76,8 +74,8 @@ class SensorCardWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(min.toStringAsFixed(0), style: TextStyle(fontSize: 10, color: isDark ? Colors.grey : Colors.grey.shade500)),
-                Text(max.toStringAsFixed(0), style: TextStyle(fontSize: 10, color: isDark ? Colors.grey : Colors.grey.shade500)),
+                Text(min.toStringAsFixed(0), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400)),
+                Text(max.toStringAsFixed(0), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade600 : Colors.grey.shade400)),
               ],
             ),
           ],
