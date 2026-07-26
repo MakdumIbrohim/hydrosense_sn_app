@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:go_router/go_router.dart';
+import '../../../../core/routes/app_router.dart';
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
 
@@ -27,7 +28,9 @@ class HelpSupportPage extends StatelessWidget {
             leading: const Icon(Icons.menu_book_outlined),
             title: const Text('Panduan Penggunaan'),
             subtitle: const Text('Cara menggunakan aplikasi & alat'),
-            onTap: () {},
+            onTap: () {
+              context.push(AppRoutes.panduanPenggunaan);
+            },
           ),
           const Divider(height: 1),
           ListTile(
