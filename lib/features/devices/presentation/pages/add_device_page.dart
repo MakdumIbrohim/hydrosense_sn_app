@@ -194,17 +194,45 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     itemCount: _scanResults.length,
                     itemBuilder: (context, index) {
                       final r = _scanResults[index];
+                      final isTarget = r.device.platformName == "HydroSense_Setup";
+                      
                       return Card(
-                        elevation: 2,
-                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        elevation: isTarget ? 6 : 2,
+                        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: isTarget 
+                              ? const BorderSide(color: Color(0xFF0D6E6E), width: 2) 
+                              : BorderSide(color: Colors.grey.shade300, width: 1),
+                        ),
+                        color: isTarget ? const Color(0xFFE0F2F1) : Colors.white,
                         child: ListTile(
-                          leading: const Icon(Icons.bluetooth, color: Colors.blue),
-                          title: Text(r.device.platformName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text(r.device.remoteId.toString(), style: const TextStyle(fontSize: 10)),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          leading: CircleAvatar(
+                            backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.shade100,
+                            child: Icon(Icons.bluetooth, color: isTarget ? const Color(0xFF0D6E6E) : Colors.grey.shade600),
+                          ),
+                          title: Text(
+                            r.device.platformName, 
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              color: isTarget ? const Color(0xFF0D6E6E) : Colors.black87,
+                              fontSize: 16,
+                            )
+                          ),
+                          subtitle: Text(
+                            r.device.remoteId.toString(), 
+                            style: const TextStyle(fontSize: 11, color: Colors.grey)
+                          ),
                           trailing: ElevatedButton(
                             onPressed: _isConnecting ? null : () => _sendData(r.device),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
-                            child: const Text('Kirim'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: isTarget ? const Color(0xFF0D6E6E) : Colors.blue.shade600, 
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                              elevation: isTarget ? 4 : 0,
+                            ),
+                            child: Text(isTarget ? 'Pilih & Kirim' : 'Kirim'),
                           ),
                         ),
                       );
