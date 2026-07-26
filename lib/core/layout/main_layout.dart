@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/custom_top_bar.dart';
 import 'package:go_router/go_router.dart';
-import '../constants/app_colors.dart';
 
 class MainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;

@@ -41,6 +41,8 @@ dependencies:
   intl: ^0.20.3
   mqtt_client: ^10.11.11
   shared_preferences: ^2.5.5
+  flutter_blue_plus: ^2.3.11
+  permission_handler: ^12.0.3
 
 dev_dependencies:
   flutter_test:
