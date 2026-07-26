@@ -81,10 +81,13 @@ class _AddDevicePageState extends State<AddDevicePage> {
       // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
       await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
       
-      // Minta kapasitas pengiriman data yang lebih besar (MTU) karena SSID + Pass bisa > 20 huruf
-      if (Platform.isAndroid) {
-        await device.requestMtu(256);
-      }
+      // Minta kapasitas pengiriman data yang lebih besar (MTU) khusus di Android
+      try {
+        if (Platform.isAndroid) {
+          await device.requestMtu(256);
+        }
+      } catch (_) {}
+      
       await Future.delayed(const Duration(milliseconds: 1000)); // Beri waktu stabil
       
       List<BluetoothService> services = await device.discoverServices();
@@ -97,7 +100,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
             if (characteristic.uuid.toString().toLowerCase().contains("beb5483e")) {
               found = true;
               String data = "${_ssidController.text};${_passController.text}";
-              await characteristic.write(utf8.encode(data));
+              
+              // Gunakan withoutResponse: true agar Linux/BlueZ tidak menolak paket
+              await characteristic.write(utf8.encode(data), withoutResponse: true);
               
               setState(() => _status = "Terkirim! Alat sedang Restart.\nCek Dashboard dalam 15 detik.");
               await Future.delayed(const Duration(seconds: 1));
