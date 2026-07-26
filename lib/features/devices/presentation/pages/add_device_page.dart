@@ -99,10 +99,15 @@ class _AddDevicePageState extends State<AddDevicePage> {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
             if (characteristic.uuid.toString().toLowerCase().contains("beb5483e")) {
               found = true;
-              String data = "${_ssidController.text};${_passController.text}";
+              String data = "${_ssidController.text};${_passController.text}#"; // Tambahkan pagar sebagai penanda akhir
               
-              // Gunakan withoutResponse: true agar Linux/BlueZ tidak menolak paket
-              await characteristic.write(utf8.encode(data), withoutResponse: true);
+              // Potong-potong data menjadi maksimal 15 karakter per kiriman (Jurus pamungkas agar lolos semua limitasi Bluetooth)
+              for (int i = 0; i < data.length; i += 15) {
+                int end = (i + 15 < data.length) ? i + 15 : data.length;
+                String chunk = data.substring(i, end);
+                await characteristic.write(utf8.encode(chunk));
+                await Future.delayed(const Duration(milliseconds: 150)); // Jeda antar potongan
+              }
               
               setState(() => _status = "Terkirim! Alat sedang Restart.\nCek Dashboard dalam 15 detik.");
               await Future.delayed(const Duration(seconds: 1));
