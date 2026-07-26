@@ -78,15 +78,13 @@ class _AddDevicePageState extends State<AddDevicePage> {
     });
 
     try {
+      // Putuskan koneksi lama (jika ada yang nyangkut) agar bersih
+      try { await device.disconnect(); } catch (_) {}
+      await Future.delayed(const Duration(milliseconds: 500));
+      
       // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
       await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
-      
-      // Minta kapasitas pengiriman data yang lebih besar (MTU) khusus di Android
-      try {
-        if (Platform.isAndroid) {
-          await device.requestMtu(256);
-        }
-      } catch (_) {}
+
       
       await Future.delayed(const Duration(milliseconds: 1000)); // Beri waktu stabil
       
