@@ -14,9 +14,10 @@ class _AddDevicePageState extends State<AddDevicePage> {
   final TextEditingController _ssidController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   
-  BluetoothDevice? _targetDevice;
+  List<ScanResult> _scanResults = [];
+  bool _isScanning = false;
   bool _isConnecting = false;
-  String _status = "Siap scan";
+  String _status = "Isi data WiFi di atas, lalu tekan tombol Cari.";
 
   @override
   void initState() {
@@ -32,48 +33,53 @@ class _AddDevicePageState extends State<AddDevicePage> {
     ].request();
   }
 
-  void _startScanAndConnect() async {
-    if (_ssidController.text.isEmpty || _passController.text.isEmpty) {
-      setState(() => _status = "Gagal: Harap isi SSID dan Password dulu!");
-      return;
-    }
-
+  void _startScan() async {
     setState(() {
-      _isConnecting = true;
-      _status = "Mencari alat ESP32...";
+      _isScanning = true;
+      _scanResults = [];
+      _status = "Mencari alat ESP32 terdekat...";
     });
     
     await FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
     
-    FlutterBluePlus.scanResults.listen((results) async {
-      for (ScanResult r in results) {
-        if (r.device.platformName == "HydroSense_Setup") {
-          FlutterBluePlus.stopScan();
-          _targetDevice = r.device;
-          setState(() => _status = "Alat ditemukan! Menghubungkan...");
-          await _sendData();
-          break;
-        }
+    FlutterBluePlus.scanResults.listen((results) {
+      if (mounted) {
+        setState(() {
+          // Hanya tampilkan alat yang ada namanya
+          _scanResults = results.where((r) => r.device.platformName.isNotEmpty).toList();
+        });
       }
     });
-    
+
     Future.delayed(const Duration(seconds: 10), () {
-      if (_targetDevice == null && mounted) {
+      if (mounted) {
         setState(() {
-          _isConnecting = false;
-          _status = "Gagal: Alat ESP32 tidak ditemukan.";
+          _isScanning = false;
+          if (_scanResults.isEmpty) {
+            _status = "Gagal: Tidak ada alat ditemukan.";
+          } else {
+            _status = "Scan selesai. Silakan pilih alat di daftar bawah.";
+          }
         });
       }
     });
   }
 
-  Future<void> _sendData() async {
-    if (_targetDevice == null) return;
+  Future<void> _sendData(BluetoothDevice device) async {
+    if (_ssidController.text.isEmpty || _passController.text.isEmpty) {
+      setState(() => _status = "Gagal: Harap isi SSID dan Password WiFi dulu!");
+      return;
+    }
+
+    setState(() {
+      _isConnecting = true;
+      _status = "Menghubungkan ke ${device.platformName}...";
+    });
 
     try {
-      await _targetDevice!.connect(license: License.nonprofit);
+      await device.connect(license: License.nonprofit);
       
-      List<BluetoothService> services = await _targetDevice!.discoverServices();
+      List<BluetoothService> services = await device.discoverServices();
       for (BluetoothService service in services) {
         if (service.uuid.toString() == "4fafc201-1fb5-459e-8fcc-c5c9c331914b") {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
@@ -83,13 +89,14 @@ class _AddDevicePageState extends State<AddDevicePage> {
               await characteristic.write(utf8.encode(data));
               
               setState(() => _status = "Berhasil! ESP32 tersambung & restart.");
-              await _targetDevice!.disconnect();
+              await device.disconnect();
               return;
             }
           }
         }
       }
-      setState(() => _status = "Gagal: Layanan Bluetooth tidak cocok.");
+      setState(() => _status = "Gagal: Layanan alat ini tidak cocok.");
+      await device.disconnect();
     } catch (e) {
       setState(() => _status = "Gagal: $e");
     } finally {
@@ -107,100 +114,104 @@ class _AddDevicePageState extends State<AddDevicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pengaturan WiFi Perangkat')),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Icon(Icons.bluetooth_connected, size: 70, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text(
-                'Hubungkan ESP32 ke Internet',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+      appBar: AppBar(title: const Text('Tambah Perangkat')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Info Box
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.withOpacity(0.3)),
               ),
-              const SizedBox(height: 16),
-              
-              // Kotak Penjelasan Fitur
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                ),
-                child: const Column(
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.info_outline, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text('Tentang Fitur Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Fitur ini akan mengirim nama jaringan WiFi dan password dari HP ke alat ESP32 Anda melalui Bluetooth.\n\n'
-                      'Setelah berhasil dikirim, alat ESP32 akan menyimpannya secara permanen dan otomatis melakukan restart untuk menyambung ke internet.',
-                      textAlign: TextAlign.justify,
-                      style: TextStyle(height: 1.4),
-                    ),
-                  ],
-                ),
+              child: const Text(
+                'Info: Masukkan WiFi rumah, lakukan Scan, lalu tekan tombol "Kirim" pada alat yang bernama HydroSense_Setup di daftar.',
+                textAlign: TextAlign.justify,
+                style: TextStyle(fontSize: 13),
               ),
-              
-              const SizedBox(height: 16),
-              Text(
-                _status == "Siap scan" 
-                  ? 'Isi formulir di bawah, pastikan Bluetooth aktif.'
-                  : _status,
+            ),
+            const SizedBox(height: 16),
+            
+            // Inputs
+            TextField(
+              controller: _ssidController,
+              decoration: const InputDecoration(
+                labelText: 'Nama WiFi SSID (Rumah/Greenhouse)',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.wifi),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _passController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Password WiFi',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.lock),
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Tombol Scan & Status
+            ElevatedButton.icon(
+              onPressed: _isScanning || _isConnecting ? null : _startScan,
+              icon: _isScanning 
+                ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                : const Icon(Icons.bluetooth_searching),
+              label: Text(_isScanning ? 'Mencari...' : 'Cari Perangkat Bluetooth'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0D6E6E),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                _status,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _status.contains('Gagal') ? Colors.red : 
-                         _status.contains('Berhasil') ? Colors.green : Colors.blue,
-                  fontWeight: _status == "Siap scan" ? FontWeight.normal : FontWeight.bold,
-                  fontSize: 15,
+                         _status.contains('Berhasil') ? Colors.green : Colors.black87,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 24),
-              
-              TextField(
-                controller: _ssidController,
-                decoration: const InputDecoration(
-                  labelText: 'Nama WiFi SSID (Misal: Greenhouse)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.wifi),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _passController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Password WiFi',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.lock),
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              ElevatedButton(
-                onPressed: _isConnecting ? null : _startScanAndConnect,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF0D6E6E), // Menyesuaikan tema hijau gelap
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                ),
-                child: Text(
-                  _isConnecting ? 'Memproses Koneksi...' : 'Kirim WiFi & Password ke Alat', 
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-                ),
-              ),
-            ],
-          ),
+            ),
+            const Divider(),
+            
+            // Daftar Perangkat
+            Expanded(
+              child: _scanResults.isEmpty 
+                ? const Center(child: Text("Belum ada perangkat ditemukan.", style: TextStyle(color: Colors.grey)))
+                : ListView.builder(
+                    itemCount: _scanResults.length,
+                    itemBuilder: (context, index) {
+                      final r = _scanResults[index];
+                      return Card(
+                        elevation: 2,
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        child: ListTile(
+                          leading: const Icon(Icons.bluetooth, color: Colors.blue),
+                          title: Text(r.device.platformName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text(r.device.remoteId.toString(), style: const TextStyle(fontSize: 10)),
+                          trailing: ElevatedButton(
+                            onPressed: _isConnecting ? null : () => _sendData(r.device),
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                            child: const Text('Kirim'),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+            ),
+          ],
         ),
       ),
     );
