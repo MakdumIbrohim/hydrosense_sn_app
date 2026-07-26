@@ -91,7 +91,7 @@ class DashboardPage extends StatelessWidget {
                       SensorCardWidget(title: 'EC Pupuk', value: data.ec.toStringAsFixed(2), unit: 'mS/cm', icon: Icons.bolt, statusColor: AppColors.success, iconColor: Colors.green),
                       SensorCardWidget(title: 'TDS', value: data.tds.toStringAsFixed(0), unit: 'ppm', icon: Icons.science, statusColor: AppColors.success, iconColor: Colors.purple),
                       SensorCardWidget(title: 'Suhu Air', value: data.waterTemperature.toStringAsFixed(1), unit: '°C', icon: Icons.thermostat, statusColor: AppColors.warning, iconColor: Colors.orange),
-                      SensorCardWidget(title: 'Volume', value: data.waterVolume.toStringAsFixed(1), unit: 'L', icon: Icons.waves, statusColor: AppColors.success, iconColor: Colors.cyan),
+                      SensorCardWidget(title: 'EC Pupuk', value: (data.tdsValue * 2).toStringAsFixed(0), unit: 'µS/cm', icon: Icons.electric_bolt, statusColor: AppColors.warning, iconColor: Colors.orange),
                     ],
                   ),
                   const SizedBox(height: 24),
