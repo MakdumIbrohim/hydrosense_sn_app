@@ -21,8 +21,8 @@ class CustomTopBar extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400), 
           child: Container(
-            margin: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            margin: const EdgeInsets.only(left: 24, right: 24, bottom: 12, top: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
             decoration: BoxDecoration(
               color: isDark ? const Color(0xFF1E293B).withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(40.0),

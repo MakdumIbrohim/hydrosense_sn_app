@@ -25,15 +25,15 @@ class DashboardPage extends StatelessWidget {
 
             final data = provider.currentData;
             if (data == null) {
-              return const Center(child: Text('Tidak ada data sensor.'));
+              return const Center(child: Text("Tidak ada data."));
             }
 
             return RefreshIndicator(
-              onRefresh: provider.refreshData,
+              onRefresh: () => provider.refreshData(),
               color: AppColors.primary,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
                 physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0, bottom: 40.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
