@@ -80,35 +80,36 @@ class _AddDevicePageState extends State<AddDevicePage> {
     try {
       // Putuskan koneksi lama (jika ada yang nyangkut) agar bersih
       try { await device.disconnect(); } catch (_) {}
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 1000));
       
       // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
-      await device.connect(license: License.nonprofit, timeout: const Duration(seconds: 10));
-
-      
-      await Future.delayed(const Duration(milliseconds: 1000)); // Beri waktu stabil
+      await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
+      await Future.delayed(const Duration(milliseconds: 1500)); // Beri waktu stabil yang agak lama
       
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
 
       for (BluetoothService service in services) {
-        // Gunakan contains agar lebih aman dari perbedaan format string UUID
-        if (service.uuid.toString().toLowerCase().contains("4fafc201")) {
+        if (service.uuid.toString().toLowerCase().contains("5fafc201")) {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
-            if (characteristic.uuid.toString().toLowerCase().contains("beb5483e")) {
+            if (characteristic.uuid.toString().toLowerCase().contains("ceb5483e")) {
               found = true;
-              String data = "${_ssidController.text};${_passController.text}#"; // Tambahkan pagar sebagai penanda akhir
+              setState(() => _status = "Menulis data ke ESP32...");
               
-              // Potong-potong data menjadi maksimal 15 karakter per kiriman (Jurus pamungkas agar lolos semua limitasi Bluetooth)
+              String data = "${_ssidController.text};${_passController.text}#"; 
+              
+              // Potong-potong data menjadi maksimal 15 karakter per kiriman
               for (int i = 0; i < data.length; i += 15) {
                 int end = (i + 15 < data.length) ? i + 15 : data.length;
                 String chunk = data.substring(i, end);
-                await characteristic.write(utf8.encode(chunk));
-                await Future.delayed(const Duration(milliseconds: 150)); // Jeda antar potongan
+                
+                // Pakai withoutResponse false agar lebih aman secara default di Android
+                await characteristic.write(utf8.encode(chunk), withoutResponse: false);
+                await Future.delayed(const Duration(milliseconds: 300)); // Jeda lebih lama
               }
               
               setState(() => _status = "Terkirim! Alat sedang Restart.\nCek Dashboard dalam 15 detik.");
-              await Future.delayed(const Duration(seconds: 1));
+              await Future.delayed(const Duration(seconds: 2));
               await device.disconnect();
               return;
             }
@@ -153,7 +154,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 border: Border.all(color: Colors.blue.withOpacity(0.3)),
               ),
               child: const Text(
-                'Info: Masukkan WiFi rumah, lakukan Scan, lalu tekan tombol "Kirim" pada alat yang bernama HydroSense_Setup di daftar.',
+                'Info: Masukkan WiFi rumah, lakukan Scan, lalu tekan tombol "Kirim" pada alat yang bernama HydroSense_V2 di daftar.',
                 textAlign: TextAlign.justify,
                 style: TextStyle(fontSize: 13),
               ),
@@ -224,7 +225,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   itemBuilder: (context, index) {
                     final r = _scanResults[index];
                     final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
-                    final isTarget = deviceName == "HydroSense_Setup";
+                    final isTarget = deviceName == "HydroSense_V2";
                     final isDark = Theme.of(context).brightness == Brightness.dark;
                     
                     return Card(
