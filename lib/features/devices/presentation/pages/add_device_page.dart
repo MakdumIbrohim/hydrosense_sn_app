@@ -35,52 +35,64 @@ class _AddDevicePageState extends State<AddDevicePage> {
   }
 
   void _startScan() async {
-    // 1. Cek izin dan perangkat keras
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-      Permission.location,
-    ].request();
+    try {
+      // 1. Cek izin dan perangkat keras
+      Map<Permission, PermissionStatus> statuses = await [
+        Permission.bluetoothScan,
+        Permission.bluetoothConnect,
+        Permission.location,
+      ].request();
 
-    if (statuses[Permission.location] != PermissionStatus.granted) {
-      setState(() => _status = "Gagal: Izin Lokasi (GPS) wajib diberikan untuk scan!");
-      return;
-    }
-
-    if (await FlutterBluePlus.adapterState.first != BluetoothAdapterState.on) {
-      setState(() => _status = "Gagal: Tolong NYALAKAN BLUETOOTH di HP Anda!");
-      return;
-    }
-
-    setState(() {
-      _isScanning = true;
-      _scanResults = [];
-      _status = "Mencari alat ESP32 terdekat...";
-    });
-    
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
-    
-    FlutterBluePlus.scanResults.listen((results) {
-      if (mounted) {
-        setState(() {
-          // Hanya tampilkan alat yang ada namanya
-          _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
-        });
+      // Di Android 12+, lokasi kadang tidak wajib, tapi kita cek saja tanpa memblokir secara absolut
+      if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
+        setState(() => _status = "Gagal: Izin Bluetooth ditolak!");
+        return;
       }
-    });
 
-    Future.delayed(const Duration(seconds: 10), () {
+      // Cek state dengan delay pendek agar tidak stuck
+      final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
+      if (state != BluetoothAdapterState.on && state != BluetoothAdapterState.unknown) {
+        setState(() => _status = "Gagal: Tolong NYALAKAN BLUETOOTH di HP Anda!");
+        return;
+      }
+
+      setState(() {
+        _isScanning = true;
+        _scanResults = [];
+        _status = "Mencari alat ESP32 terdekat...";
+      });
+      
+      await FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
+      
+      FlutterBluePlus.scanResults.listen((results) {
+        if (mounted) {
+          setState(() {
+            // Hanya tampilkan alat yang ada namanya
+            _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
+          });
+        }
+      });
+
+      Future.delayed(const Duration(seconds: 10), () {
+        if (mounted) {
+          setState(() {
+            _isScanning = false;
+            if (_scanResults.isEmpty) {
+              _status = "Gagal: Tidak ada alat ditemukan.";
+            } else {
+              _status = "Scan selesai. Silakan pilih alat di daftar bawah.";
+            }
+          });
+        }
+      });
+    } catch (e) {
       if (mounted) {
         setState(() {
           _isScanning = false;
-          if (_scanResults.isEmpty) {
-            _status = "Gagal: Tidak ada alat ditemukan.";
-          } else {
-            _status = "Scan selesai. Silakan pilih alat di daftar bawah.";
-          }
+          _status = "Error: $e";
         });
       }
-    });
+    }
   }
 
   Future<void> _sendData(BluetoothDevice device) async {
