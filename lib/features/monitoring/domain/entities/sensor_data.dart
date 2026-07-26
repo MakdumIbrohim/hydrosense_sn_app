@@ -6,6 +6,7 @@ class SensorData {
   final double waterVolume; // Volume tandon
   final NpkData npk; // Nitrogen, Fosfor, Kalium
   final DateTime timestamp;
+  final String wifiSsid; // Nama jaringan WiFi
 
   const SensorData({
     required this.ph,
@@ -15,6 +16,7 @@ class SensorData {
     required this.waterVolume,
     required this.npk,
     required this.timestamp,
+    this.wifiSsid = '',
   });
 }
 

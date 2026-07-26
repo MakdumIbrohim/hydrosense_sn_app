@@ -68,11 +68,26 @@ class DashboardPage extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Online • Terakhir update: ${DateFormat('HH:mm:ss').format(data.timestamp)}',
+                                  'Online • Update: ${DateFormat('HH:mm:ss').format(data.timestamp)}',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(Icons.wifi_rounded, size: 14, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500),
+                                const SizedBox(width: 4),
+                                Text(
+                                  data.wifiSsid.isNotEmpty ? data.wifiSsid : 'Tidak diketahui',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
                                   ),
                                 ),
                               ],

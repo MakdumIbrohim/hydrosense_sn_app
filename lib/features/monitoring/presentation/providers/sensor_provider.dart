@@ -51,6 +51,7 @@ class SensorProvider extends ChangeNotifier {
             waterTemperature: (data['temperature'] ?? 0.0).toDouble(),
             waterVolume: 0.0,
             npk: NpkData(nitrogen: 0, phosphorus: 0, potassium: 0),
+            wifiSsid: data['wifi_ssid'] ?? 'Tidak diketahui',
             timestamp: data['timestamp'] != null 
                 ? DateTime.fromMillisecondsSinceEpoch(data['timestamp'])
                 : DateTime.now(),
