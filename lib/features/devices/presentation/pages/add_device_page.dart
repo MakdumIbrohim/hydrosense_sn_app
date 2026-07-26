@@ -141,7 +141,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Tambah Perangkat')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -204,7 +204,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: _status.contains('Gagal') ? Colors.red : 
-                         _status.contains('Berhasil') ? Colors.green : 
+                         _status.contains('Terkirim') ? Colors.green : 
                          (Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -214,60 +214,63 @@ class _AddDevicePageState extends State<AddDevicePage> {
             const Divider(),
             
             // Daftar Perangkat
-            Expanded(
-              child: _scanResults.isEmpty 
-                ? const Center(child: Text("Belum ada perangkat ditemukan.", style: TextStyle(color: Colors.grey)))
-                : ListView.builder(
-                    itemCount: _scanResults.length,
-                    itemBuilder: (context, index) {
-                      final r = _scanResults[index];
-                      final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
-                      final isTarget = deviceName == "HydroSense_Setup";
-                      final isDark = Theme.of(context).brightness == Brightness.dark;
-                      
-                      return Card(
-                        elevation: isTarget ? 6 : 2,
-                        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: isTarget 
-                              ? const BorderSide(color: Color(0xFF0D6E6E), width: 2) 
-                              : BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+            _scanResults.isEmpty 
+              ? const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Center(child: Text("Belum ada perangkat ditemukan.", style: TextStyle(color: Colors.grey))),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _scanResults.length,
+                  itemBuilder: (context, index) {
+                    final r = _scanResults[index];
+                    final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
+                    final isTarget = deviceName == "HydroSense_Setup";
+                    final isDark = Theme.of(context).brightness == Brightness.dark;
+                    
+                    return Card(
+                      elevation: isTarget ? 6 : 2,
+                      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: isTarget 
+                            ? const BorderSide(color: Color(0xFF0D6E6E), width: 2) 
+                            : BorderSide(color: Colors.grey.withOpacity(0.3), width: 1),
+                      ),
+                      color: isTarget ? (isDark ? const Color(0xFF004D40) : const Color(0xFFE0F2F1)) : null,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        leading: CircleAvatar(
+                          backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
+                          child: Icon(Icons.bluetooth, color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : Colors.grey),
                         ),
-                        color: isTarget ? (isDark ? const Color(0xFF004D40) : const Color(0xFFE0F2F1)) : null,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                          leading: CircleAvatar(
-                            backgroundColor: isTarget ? const Color(0xFF0D6E6E).withOpacity(0.2) : Colors.grey.withOpacity(0.1),
-                            child: Icon(Icons.bluetooth, color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : Colors.grey),
-                          ),
-                          title: Text(
-                            deviceName, 
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold, 
-                              color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : null,
-                              fontSize: 16,
-                            )
-                          ),
-                          subtitle: Text(
-                            r.device.remoteId.toString(), 
-                            style: const TextStyle(fontSize: 11, color: Colors.grey)
-                          ),
-                          trailing: ElevatedButton(
-                            onPressed: _isConnecting ? null : () => _sendData(r.device),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: isTarget ? const Color(0xFF0D6E6E) : Colors.blue.shade600, 
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                              elevation: isTarget ? 4 : 0,
-                            ),
-                            child: Text(isTarget ? 'Pilih & Kirim' : 'Kirim'),
-                          ),
+                        title: Text(
+                          deviceName, 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : null,
+                            fontSize: 16,
+                          )
                         ),
-                      );
-                    },
-                  ),
-            ),
+                        subtitle: Text(
+                          r.device.remoteId.toString(), 
+                          style: const TextStyle(fontSize: 11, color: Colors.grey)
+                        ),
+                        trailing: ElevatedButton(
+                          onPressed: _isConnecting ? null : () => _sendData(r.device),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isTarget ? const Color(0xFF0D6E6E) : Colors.blue.shade600, 
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            elevation: isTarget ? 4 : 0,
+                          ),
+                          child: Text(isTarget ? 'Pilih & Kirim' : 'Kirim'),
+                        ),
+                      ),
+                    );
+                  },
+                ),
           ],
         ),
       ),
