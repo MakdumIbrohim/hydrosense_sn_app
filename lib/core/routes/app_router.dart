@@ -11,16 +11,19 @@ import '../../features/settings/presentation/pages/tentang_kami_page.dart';
 import '../../features/settings/presentation/pages/panduan_penggunaan_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 
+import '../../features/devices/presentation/pages/menu_page.dart';
+
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String dashboard = '/';
+  static const String menu = '/menu';
   static const String settings = '/settings';
   static const String tentangKami = '/settings/tentang-kami';
   static const String panduanPenggunaan = '/settings/panduan';
   static const String helpSupport = '/settings/help';
   static const String wifiSetup = '/settings/wifi-setup';
   static const String devices = '/devices';
-  static const String addDevice = '/devices/add';
+  static const String addDevice = '/menu/add';
   static String calibrateDevice(String id) => '/devices/$id/calibrate';
 }
 
@@ -37,26 +40,22 @@ class AppRouter {
           return MainLayout(navigationShell: navigationShell);
         },
         branches: [
-          // 0: Devices (Tank Icon)
+          // 0: Menu (Grid 2 - WiFi Config, Auto Watering)
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.devices,
-                builder: (context, state) => const DeviceListPage(),
+                path: AppRoutes.menu,
+                builder: (context, state) => const MenuPage(),
                 routes: [
                   GoRoute(
                     path: 'add',
                     builder: (context, state) => const AddDevicePage(),
                   ),
-                  GoRoute(
-                    path: ':id/calibrate',
-                    builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
-                  ),
                 ],
               ),
             ],
           ),
-          // 1: Dashboard (Dashboard Icon)
+          // 1: Dashboard
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -65,7 +64,22 @@ class AppRouter {
               ),
             ],
           ),
-          // 2: Settings (Gear Icon)
+          // 2: Devices / Alat Utama
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.devices,
+                builder: (context, state) => const DeviceListPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id/calibrate',
+                    builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          // 3: Settings
           StatefulShellBranch(
             routes: [
               GoRoute(

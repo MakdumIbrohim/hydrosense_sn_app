@@ -39,22 +39,28 @@ class CustomTopBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavBarItem(
-                  icon: Icons.smartphone_outlined,
+                  icon: Icons.grid_view_rounded,
                   isSelected: selectedIndex == 0,
                   isDark: isDark,
                   onTap: () => onItemTapped(0),
                 ),
                 _NavBarItem(
-                  icon: Icons.dashboard_rounded,
+                  icon: Icons.speed_rounded,
                   isSelected: selectedIndex == 1,
                   isDark: isDark,
                   onTap: () => onItemTapped(1),
                 ),
                 _NavBarItem(
-                  icon: Icons.settings_outlined,
+                  icon: Icons.memory_rounded,
                   isSelected: selectedIndex == 2,
                   isDark: isDark,
                   onTap: () => onItemTapped(2),
+                ),
+                _NavBarItem(
+                  icon: Icons.settings_outlined,
+                  isSelected: selectedIndex == 3,
+                  isDark: isDark,
+                  onTap: () => onItemTapped(3),
                 ),
               ],
             ),
