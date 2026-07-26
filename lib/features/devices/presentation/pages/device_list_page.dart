@@ -38,9 +38,10 @@ class DeviceListPage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go(AppRoutes.addDevice),
-        child: const Icon(Icons.add),
+        icon: const Icon(Icons.add),
+        label: const Text('Tambah Perangkat', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }
