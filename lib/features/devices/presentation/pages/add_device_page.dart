@@ -84,6 +84,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
       
       // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
       await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
+      
+      if (Platform.isAndroid) {
+        // JURUS PAMUNGKAS ANDROID: Hapus cache GATT agar HP tidak pakai memori lama
+        try { await device.clearGattCache(); } catch (_) {}
+      }
+      
       await Future.delayed(const Duration(milliseconds: 1500)); // Beri waktu stabil yang agak lama
       
       List<BluetoothService> services = await device.discoverServices();
