@@ -34,10 +34,10 @@ class DeviceListPage extends StatelessWidget {
                 child: Consumer<SensorProvider>(
                   builder: (context, provider, child) {
                     final data = provider.currentData;
-                    // Anggap online jika data Firebase ditarik kurang dari 2 menit yang lalu
+                    // Anggap online jika data Firebase ditarik kurang dari 10 detik yang lalu
                     bool isOnline = false;
                     if (data != null) {
-                      isOnline = DateTime.now().difference(data.timestamp).inMinutes < 2;
+                      isOnline = DateTime.now().difference(data.timestamp).inSeconds < 10;
                     }
 
                     return ListView(

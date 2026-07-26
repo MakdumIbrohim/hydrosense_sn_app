@@ -28,6 +28,9 @@ class DashboardPage extends StatelessWidget {
               return const Center(child: Text("Tidak ada data."));
             }
 
+            // Hitung status online (jika lebih dari 10 detik tidak ada data = offline)
+            final bool isOnline = DateTime.now().difference(data.timestamp).inSeconds < 10;
+
             return RefreshIndicator(
               onRefresh: () => provider.refreshData(),
               color: AppColors.primary,
@@ -60,15 +63,17 @@ class DashboardPage extends StatelessWidget {
                                 Container(
                                   width: 8,
                                   height: 8,
-                                  decoration: const BoxDecoration(
-                                    color: Colors.greenAccent,
+                                  decoration: BoxDecoration(
+                                    color: isOnline ? Colors.greenAccent : Colors.redAccent,
                                     shape: BoxShape.circle,
-                                    boxShadow: [BoxShadow(color: Colors.greenAccent, blurRadius: 6, spreadRadius: 1)],
+                                    boxShadow: [BoxShadow(color: isOnline ? Colors.greenAccent : Colors.redAccent, blurRadius: 6, spreadRadius: 1)],
                                   ),
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Online • Update: ${DateFormat('HH:mm:ss').format(data.timestamp)}',
+                                  isOnline 
+                                      ? 'Online • Update: ${DateFormat('HH:mm:ss').format(data.timestamp)}'
+                                      : 'Offline • Terakhir: ${DateFormat('HH:mm:ss').format(data.timestamp)}',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
