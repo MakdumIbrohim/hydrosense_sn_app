@@ -20,7 +20,7 @@ class DashboardPage extends StatelessWidget {
         child: Consumer<SensorProvider>(
           builder: (context, provider, child) {
             if (provider.isLoading && provider.currentData == null) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return _buildSkeletonLoading(isDark);
             }
 
             final data = provider.currentData;
@@ -161,6 +161,49 @@ class DashboardPage extends StatelessWidget {
             );
           }
         ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLoading(bool isDark) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SkeletonWidget(width: 180, height: 32, borderRadius: 8),
+                  const SizedBox(height: 8),
+                  const SkeletonWidget(width: 220, height: 16, borderRadius: 4),
+                  const SizedBox(height: 4),
+                  const SkeletonWidget(width: 150, height: 16, borderRadius: 4),
+                ],
+              ),
+              const SkeletonWidget(width: 48, height: 48, borderRadius: 12),
+            ],
+          ),
+          const SizedBox(height: 32),
+          const SkeletonWidget(width: 130, height: 14, borderRadius: 4),
+          const SizedBox(height: 16),
+          GridView.count(
+            crossAxisCount: 2,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            childAspectRatio: 0.95,
+            children: List.generate(4, (index) => const SkeletonWidget(width: double.infinity, height: 160, borderRadius: 20)),
+          ),
+          const SizedBox(height: 32),
+          const SkeletonWidget(width: 130, height: 14, borderRadius: 4),
+          const SizedBox(height: 16),
+          const SkeletonWidget(width: double.infinity, height: 260, borderRadius: 20),
+        ],
       ),
     );
   }
