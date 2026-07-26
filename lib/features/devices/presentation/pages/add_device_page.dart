@@ -47,7 +47,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
       if (mounted) {
         setState(() {
           // Hanya tampilkan alat yang ada namanya
-          _scanResults = results.where((r) => r.device.platformName.isNotEmpty).toList();
+          _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
         });
       }
     });
@@ -216,7 +216,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     itemCount: _scanResults.length,
                     itemBuilder: (context, index) {
                       final r = _scanResults[index];
-                      final isTarget = r.device.platformName == "HydroSense_Setup";
+                      final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
+                      final isTarget = deviceName == "HydroSense_Setup";
                       final isDark = Theme.of(context).brightness == Brightness.dark;
                       
                       return Card(
@@ -236,7 +237,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                             child: Icon(Icons.bluetooth, color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : Colors.grey),
                           ),
                           title: Text(
-                            r.device.platformName, 
+                            deviceName, 
                             style: TextStyle(
                               fontWeight: FontWeight.bold, 
                               color: isTarget ? (isDark ? Colors.tealAccent : const Color(0xFF0D6E6E)) : null,
