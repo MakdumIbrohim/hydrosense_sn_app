@@ -13,22 +13,25 @@ class CustomTopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SafeArea(
       bottom: false,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400), // Batasi lebar di desktop
+          constraints: const BoxConstraints(maxWidth: 400), 
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: isDark ? const Color(0xFF1E293B).withValues(alpha: 0.8) : Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(40.0),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: isDark ? Colors.black.withValues(alpha: 0.5) : Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -38,16 +41,19 @@ class CustomTopBar extends StatelessWidget {
                 _NavBarItem(
                   icon: Icons.smartphone_outlined,
                   isSelected: selectedIndex == 0,
+                  isDark: isDark,
                   onTap: () => onItemTapped(0),
                 ),
                 _NavBarItem(
-                  icon: Icons.dashboard_outlined,
+                  icon: Icons.dashboard_rounded,
                   isSelected: selectedIndex == 1,
+                  isDark: isDark,
                   onTap: () => onItemTapped(1),
                 ),
                 _NavBarItem(
                   icon: Icons.settings_outlined,
                   isSelected: selectedIndex == 2,
+                  isDark: isDark,
                   onTap: () => onItemTapped(2),
                 ),
               ],
@@ -62,11 +68,13 @@ class CustomTopBar extends StatelessWidget {
 class _NavBarItem extends StatelessWidget {
   final IconData icon;
   final bool isSelected;
+  final bool isDark;
   final VoidCallback onTap;
 
   const _NavBarItem({
     required this.icon,
     required this.isSelected,
+    required this.isDark,
     required this.onTap,
   });
 
@@ -76,16 +84,18 @@ class _NavBarItem extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color: isSelected ? const Color(0xFF38BDF8).withValues(alpha: 0.15) : Colors.transparent,
           shape: BoxShape.circle,
         ),
         child: Icon(
           icon,
-          color: isSelected ? AppColors.primary : Colors.white70,
-          size: 24.0,
+          color: isSelected 
+              ? const Color(0xFF38BDF8) 
+              : (isDark ? Colors.grey.shade500 : Colors.grey.shade400),
+          size: 28.0,
         ),
       ),
     );

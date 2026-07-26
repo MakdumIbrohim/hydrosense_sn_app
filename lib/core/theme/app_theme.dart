@@ -10,10 +10,11 @@ class AppTheme {
       seedColor: AppColors.primary,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: AppColors.background,
+    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.surface,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      foregroundColor: Color(0xFF1E293B),
     ),
     useMaterial3: true,
   );
@@ -23,12 +24,13 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.dark,
-      surface: AppColors.surfaceDark,
+      surface: const Color(0xFF1E293B), // Sleek tile color
     ),
-    scaffoldBackgroundColor: AppColors.backgroundDark,
+    scaffoldBackgroundColor: const Color(0xFF0F172A),
     appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primaryDark,
-      foregroundColor: AppColors.textPrimaryDark,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      foregroundColor: Colors.white,
     ),
     useMaterial3: true,
   );
