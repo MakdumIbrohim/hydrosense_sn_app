@@ -121,6 +121,7 @@ class MenuPage extends StatelessWidget {
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
                   childAspectRatio: 0.85,
+                  padding: const EdgeInsets.only(bottom: 120.0),
                   children: [
                     _MenuCard(
                       icon: Icons.wifi_rounded,

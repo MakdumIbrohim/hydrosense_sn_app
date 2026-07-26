@@ -17,19 +17,26 @@ class MainLayout extends StatelessWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 450), // Responsive desktop: mirip ukuran mobile
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
+              // Konten Halaman (Bisa discroll penuh sampai bawah)
+              Positioned.fill(
                 child: navigationShell,
               ),
-              CustomTopBar(
-                selectedIndex: navigationShell.currentIndex,
-                onItemTapped: (index) {
-                  navigationShell.goBranch(
-                    index,
-                    initialLocation: index == navigationShell.currentIndex,
-                  );
-                },
+              // Bottom Nav Bar (Mengambang di atas)
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: CustomTopBar(
+                  selectedIndex: navigationShell.currentIndex,
+                  onItemTapped: (index) {
+                    navigationShell.goBranch(
+                      index,
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  },
+                ),
               ),
             ],
           ),

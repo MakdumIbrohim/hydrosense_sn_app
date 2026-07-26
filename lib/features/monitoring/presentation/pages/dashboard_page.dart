@@ -33,7 +33,7 @@ class DashboardPage extends StatelessWidget {
               color: AppColors.primary,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0, bottom: 40.0),
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0, bottom: 120.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

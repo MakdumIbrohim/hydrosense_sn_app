@@ -42,6 +42,7 @@ class DeviceListPage extends StatelessWidget {
 
                     return ListView(
                       physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.only(bottom: 120.0),
                       children: [
                         _buildDeviceTile(
                           isDark: isDark,
