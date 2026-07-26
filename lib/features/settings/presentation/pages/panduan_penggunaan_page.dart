@@ -40,38 +40,63 @@ class PanduanPenggunaanPage extends StatelessWidget {
             
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 120.0),
                 physics: const BouncingScrollPhysics(),
                 children: [
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
                     cardColor: cardColor,
-                    iconColor: const Color(0xFF38BDF8),
-                    icon: Icons.wifi_rounded,
-                    title: '1. Menyambungkan Alat (WiFi)',
-                    content: 'Agar alat ESP32 bisa mengirim data, Anda harus menghubungkannya ke WiFi rumah/Greenhouse.\n\n'
-                        'Langkah-langkah:\n'
-                        '• Buka menu "Tambah Perangkat" di aplikasi.\n'
-                        '• Masukkan nama WiFi (SSID) dan Password WiFi rumah Anda.\n'
-                        '• Pastikan Bluetooth dan GPS/Lokasi HP Anda menyala.\n'
-                        '• Tekan "Cari Perangkat Bluetooth".\n'
-                        '• Pilih alat yang bernama "HydroSense_V2" lalu klik "Kirim".\n'
-                        '• Alat akan otomatis tersambung dan mulai mengirim data sensor.',
+                    iconColor: const Color(0xFF34D399),
+                    icon: Icons.speed_rounded,
+                    title: '1. Membaca Data (Dashboard)',
+                    content: 'Di tab "Dashboard", Anda dapat melihat kondisi air tandon secara Real-time:\n\n'
+                        '• Di paling atas, terdapat status Online/Offline beserta nama WiFi yang sedang digunakan.\n'
+                        '• pH Air: Idealnya antara 5.5 - 6.5 untuk tanaman hidroponik.\n'
+                        '• EC & TDS: Kepekatan nutrisi. Pastikan sesuai dengan umur tanaman.\n'
+                        '• Suhu Air: Idealnya tidak melebihi 28°C agar akar tidak busuk.\n'
+                        '• Grafik Tren: Menampilkan riwayat perubahan nutrisi dari waktu ke waktu.',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
                     cardColor: cardColor,
-                    iconColor: const Color(0xFF34D399),
-                    icon: Icons.dashboard_rounded,
-                    title: '2. Membaca Data (Dashboard)',
-                    content: 'Di layar utama (Dashboard), Anda dapat melihat kondisi air tandon secara Real-time:\n\n'
-                        '• pH Air: Idealnya antara 5.5 - 6.5 untuk tanaman hidroponik.\n'
-                        '• EC Pupuk: Kepekatan nutrisi. Pastikan sesuai dengan umur tanaman.\n'
-                        '• TDS: Estimasi berat pupuk yang larut (ppm).\n'
-                        '• Suhu Air: Idealnya tidak melebihi 28°C agar akar tidak busuk.',
+                    iconColor: const Color(0xFFF43F5E),
+                    icon: Icons.wifi_off_rounded,
+                    title: '2. Mereset WiFi ESP32 (Penting)',
+                    content: 'Jika Anda ingin mengganti WiFi rumah atau memindahkan alat, Anda WAJIB menghapus memori WiFi lama pada ESP32 terlebih dahulu.\n\n'
+                        'Ada 2 cara melakukan Reset:\n'
+                        '• Cara Jarak Jauh: Masuk ke tab "Pengaturan" -> Klik "Reset WiFi Alat (ESP32)".\n'
+                        '• Cara Fisik: Tekan dan tahan tombol "BOOT" pada mesin ESP32 selama 3 detik.\n\n'
+                        'Setelah direset, alat akan mati sebentar lalu menyala dalam Mode Bluetooth (memancarkan sinyal Bluetooth).',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildGuideCard(
+                    context: context,
+                    isDark: isDark,
+                    cardColor: cardColor,
+                    iconColor: const Color(0xFF38BDF8),
+                    icon: Icons.grid_view_rounded,
+                    title: '3. Menyambungkan ke WiFi Baru',
+                    content: 'Setelah alat berhasil direset (langkah 2), ikuti langkah ini:\n\n'
+                        '• Masuk ke tab "Menu" (Ikon 4 Kotak) di pojok kiri bawah.\n'
+                        '• Klik "Konfigurasi WiFi" lalu masukkan PIN Admin (Default: 123456).\n'
+                        '• Masukkan nama WiFi (SSID) dan Sandi yang baru.\n'
+                        '• Klik "Cari Perangkat Bluetooth" (Pastikan GPS/Lokasi HP menyala).\n'
+                        '• Pilih alat "HydroSense_V2" lalu klik "Kirim".\n'
+                        '• Alat akan otomatis tersambung ke WiFi baru.',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildGuideCard(
+                    context: context,
+                    isDark: isDark,
+                    cardColor: cardColor,
+                    iconColor: const Color(0xFF8B5CF6),
+                    icon: Icons.memory_rounded,
+                    title: '4. Memantau Status Perangkat',
+                    content: 'Untuk melihat alat apa saja yang terdaftar di sistem, masuk ke tab "Perangkat" (Ikon Chip/Memori).\n\n'
+                        'Di sini Anda bisa memantau apakah alat (contoh: HydroSense Node 1) sedang aktif mengirim data (Online) atau mati (Offline).',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(
@@ -80,13 +105,13 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     cardColor: cardColor,
                     iconColor: const Color(0xFFFB923C),
                     icon: Icons.settings_input_component_rounded,
-                    title: '3. Mengkalibrasi Sensor',
+                    title: '5. Mengkalibrasi Sensor',
                     content: 'Seiring berjalannya waktu, sensor pH atau TDS mungkin akan kurang akurat.\n\n'
                         'Langkah-langkah:\n'
-                        '• Masuk ke menu "Perangkat Saya" (ikon tangki di bawah).\n'
-                        '• Klik ikon "Pengaturan/Kalibrasi" di sebelah nama ESP32.\n'
-                        '• Ikuti instruksi pencelupan sensor ke air kalibrasi baku (misal pH 4.0 atau 6.86).\n'
-                        '• Simpan nilai kalibrasi yang baru.',
+                        '• Masuk ke tab "Perangkat".\n'
+                        '• Klik ikon "Pengaturan/Kalibrasi" di sebelah nama alat.\n'
+                        '• Ikuti instruksi pencelupan sensor ke air kalibrasi baku.\n'
+                        '• Simpan nilai kalibrasi yang baru (Fitur dalam pengembangan).',
                   ),
                   const SizedBox(height: 32),
                 ],
