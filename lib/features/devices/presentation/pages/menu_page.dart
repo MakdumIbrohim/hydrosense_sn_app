@@ -9,30 +9,22 @@ class MenuPage extends StatelessWidget {
     final TextEditingController pinController = TextEditingController();
     bool isError = false;
 
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return StatefulBuilder(
           builder: (context, setState) {
-            return Container(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-              ),
+            return Dialog(
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.withValues(alpha: 0.3), borderRadius: BorderRadius.circular(10))),
-                    ),
-                    const SizedBox(height: 24),
                     Row(
                       children: [
                         Container(
@@ -41,15 +33,18 @@ class MenuPage extends StatelessWidget {
                           child: const Icon(Icons.lock_rounded, color: Color(0xFFFB923C)),
                         ),
                         const SizedBox(width: 16),
-                        Text('Keamanan Admin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                        Expanded(
+                          child: Text('Keamanan Admin', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text('Masukkan PIN admin untuk mengubah pengaturan alat.', style: TextStyle(color: Colors.grey.shade500)),
+                    Text('Masukkan PIN admin untuk melanjutkan.', style: TextStyle(color: Colors.grey.shade500)),
                     const SizedBox(height: 24),
                     TextField(
                       controller: pinController,
                       obscureText: true,
+                      autofocus: true,
                       keyboardType: TextInputType.number,
                       style: TextStyle(fontSize: 20, letterSpacing: 8, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
                       textAlign: TextAlign.center,
@@ -57,32 +52,41 @@ class MenuPage extends StatelessWidget {
                         filled: true,
                         fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                        errorText: isError ? 'PIN salah! Coba lagi.' : null,
+                        errorText: isError ? 'PIN salah!' : null,
                       ),
                     ),
                     const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF38BDF8),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('BATAL', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                          ),
                         ),
-                        onPressed: () {
-                          if (pinController.text == '123456') {
-                            Navigator.pop(context);
-                            context.go(AppRoutes.addDevice);
-                          } else {
-                            setState(() => isError = true);
-                          }
-                        },
-                        child: const Text('MASUK', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5)),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF38BDF8),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            ),
+                            onPressed: () {
+                              if (pinController.text == '123456') {
+                                Navigator.pop(context);
+                                context.go(AppRoutes.addDevice);
+                              } else {
+                                setState(() => isError = true);
+                              }
+                            },
+                            child: const Text('MASUK', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
