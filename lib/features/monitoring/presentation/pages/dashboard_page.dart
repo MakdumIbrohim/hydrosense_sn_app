@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../widgets/sensor_card_widget.dart';
 import '../widgets/chart_widget.dart';
+import '../widgets/skeleton_widget.dart';
 import '../providers/sensor_provider.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -26,7 +27,36 @@ class DashboardPage extends StatelessWidget {
       body: Consumer<SensorProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && provider.currentData == null) {
-            return const Center(child: CircularProgressIndicator());
+            return SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Skeleton Status Utama
+                  const SkeletonWidget(width: double.infinity, height: 80, borderRadius: 12),
+                  const SizedBox(height: 32),
+                  
+                  // Skeleton Teks "Data Sensor"
+                  const SkeletonWidget(width: 120, height: 24),
+                  const SizedBox(height: 12),
+                  
+                  // Skeleton Grid Kartu Sensor
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    childAspectRatio: 1.2,
+                    children: List.generate(4, (index) => const SkeletonWidget(width: double.infinity, height: double.infinity, borderRadius: 16)),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Skeleton Grafik
+                  const SkeletonWidget(width: double.infinity, height: 250, borderRadius: 16),
+                ],
+              ),
+            );
           }
 
           final data = provider.currentData;
