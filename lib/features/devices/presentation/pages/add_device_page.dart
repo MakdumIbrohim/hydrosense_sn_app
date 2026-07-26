@@ -99,7 +99,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               String data = "${_ssidController.text};${_passController.text}";
               await characteristic.write(utf8.encode(data));
               
-              setState(() => _status = "Berhasil! ESP32 tersambung & restart.");
+              setState(() => _status = "Terkirim! Alat sedang Restart.\nCek Dashboard dalam 15 detik.");
               await Future.delayed(const Duration(seconds: 1));
               await device.disconnect();
               return;
