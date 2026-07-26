@@ -77,28 +77,41 @@ class _AddDevicePageState extends State<AddDevicePage> {
     });
 
     try {
+      // Putuskan koneksi lama (jika nyangkut) agar tidak error 'Bad state'
+      await device.disconnect();
+      await Future.delayed(const Duration(milliseconds: 500));
+
       await device.connect(license: License.nonprofit);
+      await Future.delayed(const Duration(milliseconds: 500)); // Beri waktu stabil
       
       List<BluetoothService> services = await device.discoverServices();
+      bool found = false;
+
       for (BluetoothService service in services) {
-        if (service.uuid.toString() == "4fafc201-1fb5-459e-8fcc-c5c9c331914b") {
+        // Gunakan contains agar lebih aman dari perbedaan format string UUID
+        if (service.uuid.toString().toLowerCase().contains("4fafc201")) {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
-            if (characteristic.uuid.toString() == "beb5483e-36e1-4688-b7f5-ea07361b26a8") {
-              
+            if (characteristic.uuid.toString().toLowerCase().contains("beb5483e")) {
+              found = true;
               String data = "${_ssidController.text};${_passController.text}";
               await characteristic.write(utf8.encode(data));
               
               setState(() => _status = "Berhasil! ESP32 tersambung & restart.");
+              await Future.delayed(const Duration(seconds: 1));
               await device.disconnect();
               return;
             }
           }
         }
       }
-      setState(() => _status = "Gagal: Layanan alat ini tidak cocok.");
-      await device.disconnect();
+      
+      if (!found) {
+        setState(() => _status = "Gagal: Layanan alat ini tidak cocok.");
+        await device.disconnect();
+      }
     } catch (e) {
       setState(() => _status = "Gagal: $e");
+      try { await device.disconnect(); } catch (_) {}
     } finally {
       if (mounted) setState(() => _isConnecting = false);
     }
