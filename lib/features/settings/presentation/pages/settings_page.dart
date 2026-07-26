@@ -59,7 +59,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text('Tentang Kami'),
-            onTap: () {},
+            onTap: () {
+              context.push(AppRoutes.tentangKami);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.help_outline),

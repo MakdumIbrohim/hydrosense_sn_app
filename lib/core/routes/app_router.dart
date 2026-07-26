@@ -7,12 +7,14 @@ import '../../features/devices/presentation/pages/device_list_page.dart';
 import '../../features/monitoring/presentation/pages/dashboard_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
+import '../../features/settings/presentation/pages/tentang_kami_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String dashboard = '/';
   static const String settings = '/settings';
+  static const String tentangKami = '/settings/tentang-kami';
   static const String helpSupport = '/settings/help';
   static const String wifiSetup = '/settings/wifi-setup';
   static const String devices = '/devices';
@@ -71,6 +73,10 @@ class AppRouter {
                   GoRoute(
                     path: 'help',
                     builder: (context, state) => const HelpSupportPage(),
+                  ),
+                  GoRoute(
+                    path: 'tentang-kami',
+                    builder: (context, state) => const TentangKamiPage(),
                   ),
                 ],
               ),
