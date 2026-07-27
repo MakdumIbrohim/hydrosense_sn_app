@@ -13,6 +13,8 @@ import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 
 import '../../features/devices/presentation/pages/menu_page.dart';
 
+import '../../features/devices/presentation/pages/device_features_page.dart';
+
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String dashboard = '/';
@@ -24,6 +26,7 @@ class AppRoutes {
   static const String wifiSetup = '/settings/wifi-setup';
   static const String devices = '/devices';
   static const String addDevice = '/menu/add';
+  static String deviceFeatures(String id) => '/devices/$id';
   static String calibrateDevice(String id) => '/devices/$id/calibrate';
 }
 
@@ -72,8 +75,14 @@ class AppRouter {
                 builder: (context, state) => const DeviceListPage(),
                 routes: [
                   GoRoute(
-                    path: ':id/calibrate',
-                    builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
+                    path: ':id',
+                    builder: (context, state) => DeviceFeaturesPage(id: state.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: 'calibrate',
+                        builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -49,7 +49,7 @@ class DeviceListPage extends StatelessWidget {
                           cardColor: cardColor,
                           title: 'HydroSense Node 1',
                           isOnline: isOnline,
-                          onCalibrate: () => context.go(AppRoutes.calibrateDevice('esp32-node-1')),
+                          onCalibrate: () => context.go(AppRoutes.deviceFeatures('esp32-node-1')),
                         ),
                       ],
                     );
@@ -86,6 +86,7 @@ class DeviceListPage extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: ListTile(
+          onTap: onCalibrate,
           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           leading: Container(
             padding: const EdgeInsets.all(12),
@@ -121,18 +122,7 @@ class DeviceListPage extends StatelessWidget {
               ),
             ],
           ),
-          trailing: InkWell(
-            onTap: onCalibrate,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.tune_rounded, color: Color(0xFF38BDF8)),
-            ),
-          ),
+          trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
         ),
       ),
     );
