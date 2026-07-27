@@ -58,11 +58,11 @@ class SensorCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           value,
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                         ),
                         Text(
                           unit,
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color),
                         ),
                       ],
                     ),
