@@ -135,18 +135,6 @@ class MenuPage extends StatelessWidget {
                       isDark: isDark,
                       onTap: () => _showPinDialog(context),
                     ),
-                    _MenuCard(
-                      icon: Icons.water_drop_rounded,
-                      title: 'Penyiraman Otomatis',
-                      subtitle: 'Akan segera hadir',
-                      color: const Color(0xFF34D399),
-                      isDark: isDark,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Fitur penyiraman otomatis masih dalam pengembangan.')),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),
