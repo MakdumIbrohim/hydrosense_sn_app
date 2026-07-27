@@ -7,45 +7,6 @@ import '../../../../core/routes/app_router.dart';
 class MenuPage extends StatelessWidget {
   const MenuPage({super.key});
 
-  void _confirmResetWiFi(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Reset WiFi Alat?'),
-        content: const Text('Tindakan ini akan menghapus koneksi WiFi pada alat fisik (ESP32). Alat akan mati lalu menyala dalam Mode Setup Bluetooth.\n\nLanjutkan?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('BATAL', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), foregroundColor: Colors.white),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengirim perintah reset...')));
-              
-              try {
-                final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
-                final httpClient = HttpClient();
-                final request = await httpClient.putUrl(url);
-                request.headers.set('Content-Type', 'application/json');
-                request.add(utf8.encode('{"reset_wifi": true}'));
-                
-                final response = await request.close();
-                if (response.statusCode == 200) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perintah berhasil dikirim! Menunggu alat restart...')));
-                }
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim perintah: $e')));
-              }
-            },
-            child: const Text('RESET ALAT'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showPinDialog(BuildContext context) {
     final TextEditingController pinController = TextEditingController();
     bool isError = false;
@@ -175,14 +136,6 @@ class MenuPage extends StatelessWidget {
                       color: const Color(0xFF38BDF8),
                       isDark: isDark,
                       onTap: () => _showPinDialog(context),
-                    ),
-                    _MenuCard(
-                      icon: Icons.wifi_off_rounded,
-                      title: 'Reset Alat',
-                      subtitle: 'Hapus koneksi WiFi ESP32',
-                      color: const Color(0xFFF43F5E),
-                      isDark: isDark,
-                      onTap: () => _confirmResetWiFi(context),
                     ),
                   ],
                 ),

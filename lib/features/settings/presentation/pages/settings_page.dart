@@ -128,75 +128,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             
-            const SizedBox(height: 32),
-            Text(
-              'PENGATURAN ALAT',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: cardColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(color: const Color(0xFFF43F5E).withValues(alpha: 0.1), shape: BoxShape.circle),
-                    child: const Icon(Icons.wifi_off_rounded, color: Color(0xFFF43F5E)),
-                  ),
-                  title: Text('Reset WiFi Alat (ESP32)', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E293B))),
-                  subtitle: const Text('Hapus memori WiFi di alat fisik', style: TextStyle(fontSize: 12)),
-                  trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
-                  onTap: () => _confirmResetWiFi(context),
-                ),
-              ),
-            ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _confirmResetWiFi(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Reset WiFi Alat?'),
-        content: const Text('Tindakan ini akan menghapus koneksi WiFi pada alat fisik (ESP32). Alat akan otomatis mati lalu menyala dalam Mode Setup Bluetooth (Lampu Biru) agar Anda bisa memasukkan WiFi baru.\n\nLanjutkan?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('BATAL', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), foregroundColor: Colors.white),
-            onPressed: () async {
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengirim perintah reset ke alat...')));
-              
-              try {
-                // Tembak command reset_wifi: true ke Firebase
-                final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
-                final httpClient = HttpClient();
-                final request = await httpClient.putUrl(url);
-                request.headers.set('Content-Type', 'application/json');
-                request.add(utf8.encode('{"reset_wifi": true}'));
-                
-                final response = await request.close();
-                if (response.statusCode == 200) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perintah berhasil dikirim! Menunggu alat restart...')));
-                }
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim perintah: $e')));
-              }
-            },
-            child: const Text('RESET ALAT'),
-          ),
-        ],
       ),
     );
   }

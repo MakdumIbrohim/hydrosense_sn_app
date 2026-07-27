@@ -164,6 +164,45 @@ class _AddDevicePageState extends State<AddDevicePage> {
     }
   }
 
+  void _confirmResetWiFi(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Reset WiFi?'),
+        content: const Text('Tindakan ini akan menghapus koneksi WiFi pada ESP32. Alat akan mati lalu menyala dalam Mode Setup Bluetooth.\n\nLanjutkan?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('BATAL', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), foregroundColor: Colors.white),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengirim perintah reset...')));
+              
+              try {
+                final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
+                final httpClient = HttpClient();
+                final request = await httpClient.putUrl(url);
+                request.headers.set('Content-Type', 'application/json');
+                request.add(utf8.encode('{"reset_wifi": true}'));
+                
+                final response = await request.close();
+                if (response.statusCode == 200) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perintah berhasil dikirim! Menunggu alat restart...')));
+                }
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim perintah: $e')));
+              }
+            },
+            child: const Text('RESET ALAT'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _ssidController.dispose();
@@ -242,11 +281,24 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'PENTING: Jika ingin mengganti WiFi dari alat yang sudah terhubung, Anda WAJIB mereset alat terlebih dahulu melalui menu Pengaturan agar sinyal Bluetooth muncul.',
+                        'PENTING: Jika ingin mengganti WiFi dari alat yang sudah terhubung, Anda WAJIB mereset alat terlebih dahulu melalui tombol di bawah ini.',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade200 : Colors.red.shade800),
                       ),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => _confirmResetWiFi(context),
+                icon: const Icon(Icons.wifi_off_rounded),
+                label: const Text('RESET WIFI', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF43F5E),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
               const SizedBox(height: 24),
