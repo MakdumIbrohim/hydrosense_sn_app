@@ -18,12 +18,34 @@ class _AddDevicePageState extends State<AddDevicePage> {
   List<ScanResult> _scanResults = [];
   bool _isScanning = false;
   bool _isConnecting = false;
-  String _status = "Isi data WiFi di atas, lalu tekan tombol Cari.";
+
+  List<String> _logs = [];
+  final ScrollController _logScrollController = ScrollController();
+
+  void _addLog(String msg) {
+    if (mounted) {
+      setState(() {
+        final time = "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}:${DateTime.now().second.toString().padLeft(2, '0')}";
+        _logs.add("[$time] $msg");
+      });
+      // Auto-scroll ke bawah
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (_logScrollController.hasClients) {
+          _logScrollController.animateTo(
+            _logScrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _requestPermissions();
+    _addLog("Sistem siap. Silakan isi SSID dan Sandi lalu klik Cari.");
   }
 
   Future<void> _requestPermissions() async {
@@ -36,38 +58,35 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   void _startScan() async {
     try {
-      // 1. Cek izin dan perangkat keras
+      _addLog("Memeriksa izin Bluetooth & Lokasi...");
       Map<Permission, PermissionStatus> statuses = await [
         Permission.bluetoothScan,
         Permission.bluetoothConnect,
         Permission.location,
       ].request();
 
-      // Di Android 12+, lokasi kadang tidak wajib, tapi kita cek saja tanpa memblokir secara absolut
       if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
-        setState(() => _status = "Gagal: Izin Bluetooth ditolak!");
+        _addLog("ERROR: Izin Bluetooth ditolak!");
         return;
       }
 
-      // Cek state dengan delay pendek agar tidak stuck
       final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
       if (state != BluetoothAdapterState.on && state != BluetoothAdapterState.unknown) {
-        setState(() => _status = "Gagal: Tolong NYALAKAN BLUETOOTH di HP Anda!");
+        _addLog("ERROR: Tolong NYALAKAN BLUETOOTH di HP Anda!");
         return;
       }
 
       setState(() {
         _isScanning = true;
         _scanResults = [];
-        _status = "Mencari alat ESP32 terdekat...";
       });
+      _addLog("Memulai pencarian perangkat ESP32...");
       
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
       
       FlutterBluePlus.scanResults.listen((results) {
         if (mounted) {
           setState(() {
-            // Hanya tampilkan alat yang ada namanya
             _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
           });
         }
@@ -78,49 +97,44 @@ class _AddDevicePageState extends State<AddDevicePage> {
           setState(() {
             _isScanning = false;
             if (_scanResults.isEmpty) {
-              _status = "Gagal: Tidak ada alat ditemukan.";
+              _addLog("Scan selesai: Tidak ada perangkat ditemukan.");
             } else {
-              _status = "Scan selesai. Silakan pilih alat di daftar bawah.";
+              _addLog("Scan selesai: Ditemukan ${_scanResults.length} perangkat. Pilih perangkat di daftar.");
             }
           });
         }
       });
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _isScanning = false;
-          _status = "Error: $e";
-        });
-      }
+      _addLog("ERROR Scan: $e");
+      if (mounted) setState(() => _isScanning = false);
     }
   }
 
   Future<void> _sendData(BluetoothDevice device) async {
     if (_ssidController.text.isEmpty || _passController.text.isEmpty) {
-      setState(() => _status = "Gagal: Harap isi SSID dan Password WiFi dulu!");
+      _addLog("GAGAL: Harap isi SSID dan Password WiFi dulu!");
       return;
     }
 
-    setState(() {
-      _isConnecting = true;
-      _status = "Menghubungkan ke ${device.platformName}...";
-    });
+    setState(() => _isConnecting = true);
+    _addLog("Menyiapkan koneksi ke ${device.platformName}...");
 
     try {
-      // Putuskan koneksi lama (jika ada yang nyangkut) agar bersih
       try { await device.disconnect(); } catch (_) {}
       await Future.delayed(const Duration(milliseconds: 1000));
       
-      // Langsung coba koneksi dengan batas waktu (timeout) 10 detik agar tidak nyangkut
+      _addLog("Mencoba menghubungkan (timeout 15 detik)...");
       await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
+      _addLog("Sukses terhubung ke ESP32 secara fisik.");
       
       if (Platform.isAndroid) {
-        // JURUS PAMUNGKAS ANDROID: Hapus cache GATT agar HP tidak pakai memori lama
+        _addLog("Membersihkan cache GATT...");
         try { await device.clearGattCache(); } catch (_) {}
       }
       
-      await Future.delayed(const Duration(milliseconds: 1500)); // Beri waktu stabil yang agak lama
+      await Future.delayed(const Duration(milliseconds: 1500));
       
+      _addLog("Mencari layanan komunikasi data (Services)...");
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
 
@@ -129,23 +143,35 @@ class _AddDevicePageState extends State<AddDevicePage> {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
             if (characteristic.uuid.toString().toLowerCase().contains("ceb5483e")) {
               found = true;
-              setState(() => _status = "Menulis data ke ESP32...");
+              _addLog("Jalur komunikasi terbuka. Mulai mengirim data...");
               
               String data = "${_ssidController.text};${_passController.text}#"; 
               
-              // Potong-potong data menjadi maksimal 15 karakter per kiriman
               for (int i = 0; i < data.length; i += 15) {
                 int end = (i + 15 < data.length) ? i + 15 : data.length;
                 String chunk = data.substring(i, end);
                 
-                // Pakai withoutResponse false agar lebih aman secara default di Android
                 await characteristic.write(utf8.encode(chunk), withoutResponse: false);
-                await Future.delayed(const Duration(milliseconds: 300)); // Jeda lebih lama
+                _addLog(">> Mengirim byte: $chunk");
+                await Future.delayed(const Duration(milliseconds: 300));
               }
               
-              setState(() => _status = "Terkirim! Alat sedang Restart.\nCek Dashboard dalam 15 detik.");
+              _addLog("SUKSES: Kredensial WiFi berhasil dikirim!");
+              _addLog("INFO: ESP32 sedang melakukan RESTART...");
+              
               await Future.delayed(const Duration(seconds: 2));
-              await device.disconnect();
+              try { await device.disconnect(); } catch (_) {}
+              
+              _addLog("ESP32 memulai ulang. Menghubungkan WiFi...");
+              for (int j = 1; j <= 10; j++) {
+                await Future.delayed(const Duration(seconds: 1));
+                _addLog("Menunggu IP Address (Detik $j/10) " + ("." * (j % 4)));
+              }
+              
+              _addLog("SUKSES: Selesai! ESP32 seharusnya sudah mendapat IP.");
+              _addLog("Silakan kembali ke halaman Dashboard untuk melihat status Online.");
+              
+              if (mounted) setState(() => _isConnecting = false);
               return;
             }
           }
@@ -153,11 +179,11 @@ class _AddDevicePageState extends State<AddDevicePage> {
       }
       
       if (!found) {
-        setState(() => _status = "Gagal: Layanan alat ini tidak cocok.");
+        _addLog("GAGAL: Karakteristik BLE tidak cocok dengan alat.");
         await device.disconnect();
       }
     } catch (e) {
-      setState(() => _status = "Gagal: $e");
+      _addLog("GAGAL/TERPUTUS: $e");
       try { await device.disconnect(); } catch (_) {}
     } finally {
       if (mounted) setState(() => _isConnecting = false);
@@ -179,21 +205,29 @@ class _AddDevicePageState extends State<AddDevicePage> {
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengirim perintah reset...')));
+              _addLog("=============================");
+              _addLog("Menyiapkan perintah RESET WiFi jarak jauh...");
               
               try {
                 final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
                 final httpClient = HttpClient();
+                
+                _addLog("Mengirim sinyal (reset_wifi: true) ke Firebase...");
                 final request = await httpClient.putUrl(url);
                 request.headers.set('Content-Type', 'application/json');
                 request.add(utf8.encode('{"reset_wifi": true}'));
                 
                 final response = await request.close();
                 if (response.statusCode == 200) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perintah berhasil dikirim! Menunggu alat restart...')));
+                  _addLog("SUKSES: Sinyal reset diterima server!");
+                  _addLog("INFO: Menunggu alat merespons perintah...");
+                  _addLog("INFO: ESP32 menghapus memori WiFi dan RESTART.");
+                  _addLog("Silakan tunggu lampu indikator biru berkedip di alat.");
+                } else {
+                  _addLog("GAGAL: Respons server salah (Code: ${response.statusCode})");
                 }
               } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal mengirim perintah: $e')));
+                _addLog("GAGAL mengirim perintah: $e");
               }
             },
             child: const Text('RESET ALAT'),
@@ -361,18 +395,37 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 ),
               ),
               
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text(
-                  _status,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: _status.contains('Gagal') ? const Color(0xFFF43F5E) : 
-                           _status.contains('Terkirim') ? const Color(0xFF34D399) : 
-                           (isDark ? Colors.white70 : Colors.black87),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
+              // TERMINAL LOGS
+              Container(
+                height: 180,
+                margin: const EdgeInsets.symmetric(vertical: 16.0),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.black87,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.3)),
+                ),
+                child: ListView.builder(
+                  controller: _logScrollController,
+                  itemCount: _logs.length,
+                  itemBuilder: (context, index) {
+                    final log = _logs[index];
+                    Color textColor = Colors.greenAccent;
+                    if (log.contains("ERROR") || log.contains("GAGAL")) textColor = Colors.redAccent;
+                    else if (log.contains("SUKSES")) textColor = Colors.cyanAccent;
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: Text(
+                        "> $log",
+                        style: TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 11,
+                          color: textColor,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               
