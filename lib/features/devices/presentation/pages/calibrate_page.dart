@@ -15,22 +15,23 @@ class _CalibratePageState extends State<CalibratePage> {
   final TextEditingController _tdsKController = TextEditingController(text: "1.30");
   bool _isLoading = false;
 
-  List<String> _logs = [];
-  final ScrollController _logScrollController = ScrollController();
+  String _statusMessage = "";
+  bool _isSuccess = false;
+  bool _isError = false;
 
-  void _addLog(String msg) {
+  void _updateStatus(String msg) {
     if (mounted) {
       setState(() {
-        final time = "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}:${DateTime.now().second.toString().padLeft(2, '0')}";
-        _logs.add("[$time] $msg");
-      });
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (_logScrollController.hasClients) {
-          _logScrollController.animateTo(
-            _logScrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
+        _statusMessage = msg;
+        if (msg.contains("ERROR") || msg.contains("GAGAL")) {
+          _isError = true;
+          _isSuccess = false;
+        } else if (msg.contains("SUKSES")) {
+          _isSuccess = true;
+          _isError = false;
+        } else {
+          _isError = false;
+          _isSuccess = false;
         }
       });
     }
@@ -38,7 +39,7 @@ class _CalibratePageState extends State<CalibratePage> {
 
   Future<void> _fetchCurrentKValue() async {
     setState(() => _isLoading = true);
-    _addLog("Mengambil data K-Value dari Firebase...");
+    _updateStatus("Mengambil data K-Value dari Firebase...");
     try {
       final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/settings.json");
       final httpClient = HttpClient();
@@ -50,16 +51,16 @@ class _CalibratePageState extends State<CalibratePage> {
           final data = jsonDecode(responseBody);
           if (data['tds_k_value'] != null) {
             _tdsKController.text = data['tds_k_value'].toString();
-            _addLog("SUKSES: K-Value saat ini adalah ${_tdsKController.text}");
+            _updateStatus("SUKSES: K-Value saat ini adalah ${_tdsKController.text}");
           } else {
-            _addLog("INFO: K-Value belum diset sebelumnya.");
+            _updateStatus("INFO: K-Value belum diset sebelumnya.");
           }
         }
       } else {
-        _addLog("GAGAL: Respons server salah (Code: ${response.statusCode})");
+        _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
       }
     } catch (e) {
-      _addLog("GAGAL narik setting kalibrasi: $e");
+      _updateStatus("GAGAL narik setting kalibrasi: $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -68,33 +69,33 @@ class _CalibratePageState extends State<CalibratePage> {
   Future<void> _saveCalibration() async {
     final double? newValue = double.tryParse(_tdsKController.text.replaceAll(',', '.'));
     if (newValue == null || newValue <= 0) {
-      _addLog("ERROR: Angka K-Value tidak valid!");
+      _updateStatus("ERROR: Angka K-Value tidak valid!");
       return;
     }
 
     setState(() => _isLoading = true);
-    _addLog("=============================");
-    _addLog("Menyiapkan pembaruan kalibrasi TDS...");
+    _updateStatus("=============================");
+    _updateStatus("Menyiapkan pembaruan kalibrasi TDS...");
     
     try {
       final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/settings.json");
       final httpClient = HttpClient();
       
-      _addLog("Menulis data (tds_k_value: $newValue) ke Firebase...");
+      _updateStatus("Menulis data (tds_k_value: $newValue) ke Firebase...");
       final request = await httpClient.patchUrl(url);
       request.headers.set('Content-Type', 'application/json');
       request.add(utf8.encode(jsonEncode({'tds_k_value': newValue})));
       
       final response = await request.close();
       if (response.statusCode == 200) {
-        _addLog("SUKSES: Kalibrasi berhasil disimpan di server!");
-        _addLog("INFO: ESP32 akan menarik nilai ini pada sinkronisasi berikutnya.");
-        _addLog("Silakan tunggu beberapa detik hingga grafik TDS berubah.");
+        _updateStatus("SUKSES: Kalibrasi berhasil disimpan di server!");
+        _updateStatus("INFO: ESP32 akan menarik nilai ini pada sinkronisasi berikutnya.");
+        _updateStatus("Silakan tunggu beberapa detik hingga grafik TDS berubah.");
       } else {
-        _addLog("GAGAL: Respons server salah (Code: ${response.statusCode})");
+        _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
       }
     } catch (e) {
-      _addLog("GAGAL menyimpan kalibrasi: $e");
+      _updateStatus("GAGAL menyimpan kalibrasi: $e");
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -211,38 +212,64 @@ class _CalibratePageState extends State<CalibratePage> {
                 ),
               ),
               
-              // TERMINAL LOGS
-              if (_logs.isNotEmpty)
+              // STATUS BOX
+              if (_statusMessage.isNotEmpty)
                 Container(
-                  height: 150,
                   margin: const EdgeInsets.only(top: 24.0, bottom: 24.0),
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.3)),
+                    color: _isError 
+                        ? const Color(0xFFF43F5E).withValues(alpha: 0.1) 
+                        : _isSuccess 
+                            ? const Color(0xFF34D399).withValues(alpha: 0.1)
+                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _isError 
+                          ? const Color(0xFFF43F5E).withValues(alpha: 0.3)
+                          : _isSuccess
+                              ? const Color(0xFF34D399).withValues(alpha: 0.3)
+                              : Colors.transparent,
+                    ),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
                   ),
-                  child: ListView.builder(
-                    controller: _logScrollController,
-                    itemCount: _logs.length,
-                    itemBuilder: (context, index) {
-                      final log = _logs[index];
-                      Color textColor = Colors.greenAccent;
-                      if (log.contains("ERROR") || log.contains("GAGAL")) textColor = Colors.redAccent;
-                      else if (log.contains("SUKSES")) textColor = Colors.cyanAccent;
-                      
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Row(
+                    children: [
+                      if (!_isError && !_isSuccess && _isLoading)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: SizedBox(
+                            width: 20, 
+                            height: 20, 
+                            child: CircularProgressIndicator(strokeWidth: 2)
+                          ),
+                        )
+                      else if (_isError)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E)),
+                        )
+                      else if (_isSuccess)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399)),
+                        )
+                      else
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.info_outline_rounded, color: Colors.blue),
+                        ),
+                      Expanded(
                         child: Text(
-                          "> $log",
+                          _statusMessage,
                           style: TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 11,
-                            color: textColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.white70 : Colors.black87),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                 ),
             ],

@@ -19,23 +19,23 @@ class _AddDevicePageState extends State<AddDevicePage> {
   bool _isScanning = false;
   bool _isConnecting = false;
 
-  List<String> _logs = [];
-  final ScrollController _logScrollController = ScrollController();
+  String _statusMessage = "";
+  bool _isSuccess = false;
+  bool _isError = false;
 
-  void _addLog(String msg) {
+  void _updateStatus(String msg) {
     if (mounted) {
       setState(() {
-        final time = "${DateTime.now().hour.toString().padLeft(2, '0')}:${DateTime.now().minute.toString().padLeft(2, '0')}:${DateTime.now().second.toString().padLeft(2, '0')}";
-        _logs.add("[$time] $msg");
-      });
-      // Auto-scroll ke bawah
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (_logScrollController.hasClients) {
-          _logScrollController.animateTo(
-            _logScrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
+        _statusMessage = msg;
+        if (msg.contains("ERROR") || msg.contains("GAGAL")) {
+          _isError = true;
+          _isSuccess = false;
+        } else if (msg.contains("SUKSES")) {
+          _isSuccess = true;
+          _isError = false;
+        } else {
+          _isError = false;
+          _isSuccess = false;
         }
       });
     }
@@ -45,7 +45,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
   void initState() {
     super.initState();
     _requestPermissions();
-    _addLog("Sistem siap. Silakan isi SSID dan Sandi lalu klik Cari.");
+    _updateStatus("Sistem siap. Silakan isi SSID dan Sandi lalu klik Cari.");
   }
 
   Future<void> _requestPermissions() async {
@@ -58,7 +58,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
 
   void _startScan() async {
     try {
-      _addLog("Memeriksa izin Bluetooth & Lokasi...");
+      _updateStatus("Memeriksa izin Bluetooth & Lokasi...");
       Map<Permission, PermissionStatus> statuses = await [
         Permission.bluetoothScan,
         Permission.bluetoothConnect,
@@ -66,13 +66,13 @@ class _AddDevicePageState extends State<AddDevicePage> {
       ].request();
 
       if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
-        _addLog("ERROR: Izin Bluetooth ditolak!");
+        _updateStatus("ERROR: Izin Bluetooth ditolak!");
         return;
       }
 
       final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
       if (state != BluetoothAdapterState.on && state != BluetoothAdapterState.unknown) {
-        _addLog("ERROR: Tolong NYALAKAN BLUETOOTH di HP Anda!");
+        _updateStatus("ERROR: Tolong NYALAKAN BLUETOOTH di HP Anda!");
         return;
       }
 
@@ -80,7 +80,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
         _isScanning = true;
         _scanResults = [];
       });
-      _addLog("Memulai pencarian perangkat ESP32...");
+      _updateStatus("Memulai pencarian perangkat ESP32...");
       
       await FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
       
@@ -97,44 +97,44 @@ class _AddDevicePageState extends State<AddDevicePage> {
           setState(() {
             _isScanning = false;
             if (_scanResults.isEmpty) {
-              _addLog("Scan selesai: Tidak ada perangkat ditemukan.");
+              _updateStatus("Scan selesai: Tidak ada perangkat ditemukan.");
             } else {
-              _addLog("Scan selesai: Ditemukan ${_scanResults.length} perangkat. Pilih perangkat di daftar.");
+              _updateStatus("Scan selesai: Ditemukan ${_scanResults.length} perangkat. Pilih perangkat di daftar.");
             }
           });
         }
       });
     } catch (e) {
-      _addLog("ERROR Scan: $e");
+      _updateStatus("ERROR Scan: $e");
       if (mounted) setState(() => _isScanning = false);
     }
   }
 
   Future<void> _sendData(BluetoothDevice device) async {
     if (_ssidController.text.isEmpty || _passController.text.isEmpty) {
-      _addLog("GAGAL: Harap isi SSID dan Password WiFi dulu!");
+      _updateStatus("GAGAL: Harap isi SSID dan Password WiFi dulu!");
       return;
     }
 
     setState(() => _isConnecting = true);
-    _addLog("Menyiapkan koneksi ke ${device.platformName}...");
+    _updateStatus("Menyiapkan koneksi ke ${device.platformName}...");
 
     try {
       try { await device.disconnect(); } catch (_) {}
       await Future.delayed(const Duration(milliseconds: 1000));
       
-      _addLog("Mencoba menghubungkan (timeout 15 detik)...");
+      _updateStatus("Mencoba menghubungkan (timeout 15 detik)...");
       await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
-      _addLog("Sukses terhubung ke ESP32 secara fisik.");
+      _updateStatus("Sukses terhubung ke ESP32 secara fisik.");
       
       if (Platform.isAndroid) {
-        _addLog("Membersihkan cache GATT...");
+        _updateStatus("Membersihkan cache GATT...");
         try { await device.clearGattCache(); } catch (_) {}
       }
       
       await Future.delayed(const Duration(milliseconds: 1500));
       
-      _addLog("Mencari layanan komunikasi data (Services)...");
+      _updateStatus("Mencari layanan komunikasi data (Services)...");
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
 
@@ -143,7 +143,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
           for (BluetoothCharacteristic characteristic in service.characteristics) {
             if (characteristic.uuid.toString().toLowerCase().contains("ceb5483e")) {
               found = true;
-              _addLog("Jalur komunikasi terbuka. Mulai mengirim data...");
+              _updateStatus("Jalur komunikasi terbuka. Mulai mengirim data...");
               
               String data = "${_ssidController.text};${_passController.text}#"; 
               
@@ -152,24 +152,24 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 String chunk = data.substring(i, end);
                 
                 await characteristic.write(utf8.encode(chunk), withoutResponse: false);
-                _addLog(">> Mengirim byte: $chunk");
+                _updateStatus(">> Mengirim byte: $chunk");
                 await Future.delayed(const Duration(milliseconds: 300));
               }
               
-              _addLog("SUKSES: Kredensial WiFi berhasil dikirim!");
-              _addLog("INFO: ESP32 sedang melakukan RESTART...");
+              _updateStatus("SUKSES: Kredensial WiFi berhasil dikirim!");
+              _updateStatus("INFO: ESP32 sedang melakukan RESTART...");
               
               await Future.delayed(const Duration(seconds: 2));
               try { await device.disconnect(); } catch (_) {}
               
-              _addLog("ESP32 memulai ulang. Menghubungkan WiFi...");
+              _updateStatus("ESP32 memulai ulang. Menghubungkan WiFi...");
               for (int j = 1; j <= 10; j++) {
                 await Future.delayed(const Duration(seconds: 1));
-                _addLog("Menunggu IP Address (Detik $j/10) " + ("." * (j % 4)));
+                _updateStatus("Menunggu IP Address (Detik $j/10) " + ("." * (j % 4)));
               }
               
-              _addLog("SUKSES: Selesai! ESP32 seharusnya sudah mendapat IP.");
-              _addLog("Silakan kembali ke halaman Dashboard untuk melihat status Online.");
+              _updateStatus("SUKSES: Selesai! ESP32 seharusnya sudah mendapat IP.");
+              _updateStatus("Silakan kembali ke halaman Dashboard untuk melihat status Online.");
               
               if (mounted) setState(() => _isConnecting = false);
               return;
@@ -179,11 +179,11 @@ class _AddDevicePageState extends State<AddDevicePage> {
       }
       
       if (!found) {
-        _addLog("GAGAL: Karakteristik BLE tidak cocok dengan alat.");
+        _updateStatus("GAGAL: Karakteristik BLE tidak cocok dengan alat.");
         await device.disconnect();
       }
     } catch (e) {
-      _addLog("GAGAL/TERPUTUS: $e");
+      _updateStatus("GAGAL/TERPUTUS: $e");
       try { await device.disconnect(); } catch (_) {}
     } finally {
       if (mounted) setState(() => _isConnecting = false);
@@ -205,29 +205,29 @@ class _AddDevicePageState extends State<AddDevicePage> {
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF43F5E), foregroundColor: Colors.white),
             onPressed: () async {
               Navigator.pop(ctx);
-              _addLog("=============================");
-              _addLog("Menyiapkan perintah RESET WiFi jarak jauh...");
+              _updateStatus("=============================");
+              _updateStatus("Menyiapkan perintah RESET WiFi jarak jauh...");
               
               try {
                 final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
                 final httpClient = HttpClient();
                 
-                _addLog("Mengirim sinyal (reset_wifi: true) ke Firebase...");
+                _updateStatus("Mengirim sinyal (reset_wifi: true) ke Firebase...");
                 final request = await httpClient.putUrl(url);
                 request.headers.set('Content-Type', 'application/json');
                 request.add(utf8.encode('{"reset_wifi": true}'));
                 
                 final response = await request.close();
                 if (response.statusCode == 200) {
-                  _addLog("SUKSES: Sinyal reset diterima server!");
-                  _addLog("INFO: Menunggu alat merespons perintah...");
-                  _addLog("INFO: ESP32 menghapus memori WiFi dan RESTART.");
-                  _addLog("Silakan tunggu lampu indikator biru berkedip di alat.");
+                  _updateStatus("SUKSES: Sinyal reset diterima server!");
+                  _updateStatus("INFO: Menunggu alat merespons perintah...");
+                  _updateStatus("INFO: ESP32 menghapus memori WiFi dan RESTART.");
+                  _updateStatus("Silakan tunggu lampu indikator biru berkedip di alat.");
                 } else {
-                  _addLog("GAGAL: Respons server salah (Code: ${response.statusCode})");
+                  _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
                 }
               } catch (e) {
-                _addLog("GAGAL mengirim perintah: $e");
+                _updateStatus("GAGAL mengirim perintah: $e");
               }
             },
             child: const Text('RESET ALAT'),
@@ -395,39 +395,65 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 ),
               ),
               
-              // TERMINAL LOGS
-              Container(
-                height: 180,
-                margin: const EdgeInsets.symmetric(vertical: 16.0),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.black87,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.3)),
-                ),
-                child: ListView.builder(
-                  controller: _logScrollController,
-                  itemCount: _logs.length,
-                  itemBuilder: (context, index) {
-                    final log = _logs[index];
-                    Color textColor = Colors.greenAccent;
-                    if (log.contains("ERROR") || log.contains("GAGAL")) textColor = Colors.redAccent;
-                    else if (log.contains("SUKSES")) textColor = Colors.cyanAccent;
-                    
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: Text(
-                        "> $log",
-                        style: TextStyle(
-                          fontFamily: 'monospace',
-                          fontSize: 11,
-                          color: textColor,
+              if (_statusMessage.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 16.0),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: _isError 
+                        ? const Color(0xFFF43F5E).withValues(alpha: 0.1) 
+                        : _isSuccess 
+                            ? const Color(0xFF34D399).withValues(alpha: 0.1)
+                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: _isError 
+                          ? const Color(0xFFF43F5E).withValues(alpha: 0.3)
+                          : _isSuccess
+                              ? const Color(0xFF34D399).withValues(alpha: 0.3)
+                              : Colors.transparent,
+                    ),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+                  ),
+                  child: Row(
+                    children: [
+                      if (!_isError && !_isSuccess && (_isScanning || _isConnecting || _statusMessage.contains("Menunggu") || _statusMessage.contains("menghubungkan")))
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: SizedBox(
+                            width: 20, 
+                            height: 20, 
+                            child: CircularProgressIndicator(strokeWidth: 2)
+                          ),
+                        )
+                      else if (_isError)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E)),
+                        )
+                      else if (_isSuccess)
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399)),
+                        )
+                      else
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(Icons.info_outline_rounded, color: Colors.blue),
+                        ),
+                      Expanded(
+                        child: Text(
+                          _statusMessage,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.white70 : Colors.black87),
+                          ),
                         ),
                       ),
-                    );
-                  },
+                    ],
+                  ),
                 ),
-              ),
               
               if (_scanResults.isNotEmpty) ...[
                 Text('HASIL SCAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
