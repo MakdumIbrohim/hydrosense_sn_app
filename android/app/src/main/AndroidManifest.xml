@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="hydrosense_sn_app"
+        android:label="HydroSense SN"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
