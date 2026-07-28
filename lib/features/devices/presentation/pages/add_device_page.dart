@@ -281,9 +281,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   }
                   
                   if (espResponded) {
-                     _updateStatus("SUKSES: Mikro kontroler merespons! Memori dihapus dan sedang Restart (Lampu biru akan berkedip).");
+                     _updateStatus("SUKSES: Mikro kontroler berhasil direset!");
                   } else {
-                     _updateStatus("GAGAL: Mikro kontroler tidak merespons perintah. Pastikan alat sedang menyala dan terhubung WiFi.");
+                     _updateStatus("GAGAL: Mikro kontroler tidak merespons perintah. Pastikan alat sedang menyala dan terhubung jaringan.");
                   }
                 } else {
                   _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
@@ -355,7 +355,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Masukkan WiFi rumah, lakukan Scan, lalu tekan "Kirim" pada mikro kontroler bernama HydroSense_V2.',
+                        'Masukkan nama jaringan (WiFi Rumah atau Hotspot HP), lakukan Scan, lalu tekan "Kirim" pada mikro kontroler.',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade100 : Colors.blue.shade900),
                       ),
                     ),
@@ -371,7 +371,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 controller: _ssidController,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
-                  labelText: 'Nama WiFi SSID',
+                  labelText: 'Nama WiFi / Hotspot (SSID)',
                   labelStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
@@ -385,7 +385,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 obscureText: true,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
-                  labelText: 'Password WiFi',
+                  labelText: 'Password WiFi / Hotspot',
                   labelStyle: const TextStyle(color: Colors.grey),
                   filled: true,
                   fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
