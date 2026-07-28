@@ -39,7 +39,6 @@ class _CalibratePageState extends State<CalibratePage> {
 
   Future<void> _fetchCurrentKValue() async {
     setState(() => _isLoading = true);
-    _updateStatus("Mengambil data K-Value dari Firebase...");
     try {
       final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/settings.json");
       final httpClient = HttpClient();
@@ -51,13 +50,12 @@ class _CalibratePageState extends State<CalibratePage> {
           final data = jsonDecode(responseBody);
           if (data['tds_k_value'] != null) {
             _tdsKController.text = data['tds_k_value'].toString();
-            _updateStatus("SUKSES: K-Value saat ini adalah ${_tdsKController.text}");
-          } else {
-            _updateStatus("INFO: K-Value belum diset sebelumnya.");
+            // Kosongkan pesan jika berhasil mengambil data, agar tidak muncul kotak hijau membingungkan di awal
+            if (mounted) setState(() { _statusMessage = ""; _isSuccess = false; _isError = false; });
           }
         }
       } else {
-        _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
+        _updateStatus("GAGAL: Gagal memuat data (Code: ${response.statusCode})");
       }
     } catch (e) {
       _updateStatus("GAGAL narik setting kalibrasi: $e");
@@ -112,7 +110,7 @@ class _CalibratePageState extends State<CalibratePage> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text('Kalibrasi Mikro Kontroler', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
+        title: Text('Kalibrasi TDS', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
