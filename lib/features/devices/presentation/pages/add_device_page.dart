@@ -288,6 +288,15 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   }
                   
                   if (espResponded) {
+                     // Paksa update timestamp di Firebase menjadi 0 agar UI langsung mendeteksi "Offline"
+                     try {
+                        final forceOfflineUrl = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json");
+                        final req = await HttpClient().patchUrl(forceOfflineUrl);
+                        req.headers.set('Content-Type', 'application/json');
+                        req.add(utf8.encode('{"timestamp": 0}'));
+                        await req.close();
+                     } catch (_) {}
+
                      _updateStatus("SUKSES: Mikro kontroler berhasil direset!");
                   } else {
                      _updateStatus("GAGAL: Mikro kontroler tidak merespons perintah. Pastikan alat sedang menyala dan terhubung jaringan.");
