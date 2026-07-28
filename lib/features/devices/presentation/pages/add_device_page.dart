@@ -18,6 +18,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
   List<ScanResult> _scanResults = [];
   bool _isScanning = false;
   bool _isConnecting = false;
+  bool _isObscure = true;
 
   String _statusMessage = "";
   bool _isSuccess = false;
@@ -70,6 +71,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
         return;
       }
 
+      bool isLocationOn = await Permission.location.serviceStatus.isEnabled;
+      if (!isLocationOn) {
+        _updateStatus("ERROR: Tolong NYALAKAN LOKASI (GPS) di HP Anda untuk melakukan Scan Bluetooth!");
+        return;
+      }
+
       final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
       if (state != BluetoothAdapterState.on && state != BluetoothAdapterState.unknown) {
         _updateStatus("ERROR: Tolong NYALAKAN BLUETOOTH di HP Anda!");
@@ -89,7 +96,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
           setState(() {
             _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
             
-            // Cek secara dinamis berdasarkan Service UUID ESP32 kita, bukan nama
+            // Menggunakan identifikasi dinamis UUID ESP32
             bool isFound = _scanResults.any((r) {
               return r.advertisementData.serviceUuids.any(
                 (uuid) => uuid.toString().toLowerCase().contains("5fafc201")
@@ -382,7 +389,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               const SizedBox(height: 12),
               TextField(
                 controller: _passController,
-                obscureText: true,
+                obscureText: _isObscure,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
                   labelText: 'Password WiFi / Hotspot',
@@ -391,6 +398,17 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                   prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                      color: Colors.grey,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -501,7 +519,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                       final r = _scanResults[index];
                       final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
                       
-                      // Cek apakah ini ESP32 milik kita berdasarkan UUID uniknya
+                      // Cek secara dinamis berdasarkan UUID uniknya
                       final isTarget = r.advertisementData.serviceUuids.any((uuid) => uuid.toString().toLowerCase().contains("5fafc201"));
                       
                       return Container(
