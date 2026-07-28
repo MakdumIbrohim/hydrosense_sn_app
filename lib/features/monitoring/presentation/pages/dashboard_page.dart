@@ -82,17 +82,21 @@ class DashboardPage extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Row(
                               children: [
-                                Icon(Icons.wifi_rounded, size: 14, color: isDark ? Colors.grey.shade500 : Colors.grey.shade500),
-                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.wifi_rounded, 
+                                  size: 18, 
+                                  color: isOnline ? const Color(0xFF34D399) : Colors.grey.shade500
+                                ),
+                                const SizedBox(width: 6),
                                 Text(
                                   data.wifiSsid.isNotEmpty ? data.wifiSsid : 'Tidak diketahui',
                                   style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: isOnline ? const Color(0xFF34D399) : Colors.grey.shade500,
                                   ),
                                 ),
                               ],

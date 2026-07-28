@@ -185,6 +185,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               _updateStatus("Mikro kontroler memulai ulang. Menghubungkan WiFi...");
               bool isOnline = false;
               String targetSsid = _ssidController.text;
+              final startTime = DateTime.now().millisecondsSinceEpoch;
               
               for (int j = 1; j <= 15; j++) {
                 await Future.delayed(const Duration(seconds: 1));
@@ -200,10 +201,12 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         final body = await response.transform(utf8.decoder).join();
                         if (body != "null" && body.isNotEmpty) {
                           final data = jsonDecode(body);
-                          // Jika status wifi sudah sama dengan yang diinput
-                          if (data['wifi_ssid'] == targetSsid) {
-                             isOnline = true;
-                             break;
+                          // Pastikan SSID sama DAN data ini adalah data baru (bukan sisa data lama di database)
+                          if (data['wifi_ssid'] == targetSsid && data['timestamp'] != null) {
+                             if (data['timestamp'] > (startTime - 5000)) {
+                                 isOnline = true;
+                                 break;
+                             }
                           }
                         }
                      }
@@ -293,7 +296,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
                         final forceOfflineUrl = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json");
                         final req = await HttpClient().patchUrl(forceOfflineUrl);
                         req.headers.set('Content-Type', 'application/json');
-                        req.add(utf8.encode('{"timestamp": 0}'));
+                        final pastTime = DateTime.now().millisecondsSinceEpoch - 15000;
+                        req.add(utf8.encode('{"timestamp": $pastTime}'));
                         await req.close();
                      } catch (_) {}
 
