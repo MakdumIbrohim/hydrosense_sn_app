@@ -41,7 +41,7 @@ class DeviceListPage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    Text('Masukkan PIN admin untuk mengakses alat.', style: TextStyle(color: Colors.grey.shade500)),
+                    Text('Masukkan PIN admin untuk mengakses mikro kontroler.', style: TextStyle(color: Colors.grey.shade500)),
                     const SizedBox(height: 24),
                     TextField(
                       controller: pinController,

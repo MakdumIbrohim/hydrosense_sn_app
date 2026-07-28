@@ -88,9 +88,7 @@ class _CalibratePageState extends State<CalibratePage> {
       
       final response = await request.close();
       if (response.statusCode == 200) {
-        _updateStatus("SUKSES: Kalibrasi berhasil disimpan di server!");
-        _updateStatus("INFO: ESP32 akan menarik nilai ini pada sinkronisasi berikutnya.");
-        _updateStatus("Silakan tunggu beberapa detik hingga grafik TDS berubah.");
+        _updateStatus("SUKSES: Kalibrasi disimpan! Grafik TDS akan berubah dalam beberapa detik.");
       } else {
         _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
       }
@@ -114,7 +112,7 @@ class _CalibratePageState extends State<CalibratePage> {
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: Text('Kalibrasi Alat', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
+        title: Text('Kalibrasi Mikro Kontroler', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),

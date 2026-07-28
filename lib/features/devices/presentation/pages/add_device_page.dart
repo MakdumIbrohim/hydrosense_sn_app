@@ -88,12 +88,25 @@ class _AddDevicePageState extends State<AddDevicePage> {
         if (mounted) {
           setState(() {
             _scanResults = results.where((r) => r.advertisementData.advName.isNotEmpty || r.device.platformName.isNotEmpty).toList();
+            
+            // Cek secara dinamis berdasarkan Service UUID ESP32 kita, bukan nama
+            bool isFound = _scanResults.any((r) {
+              return r.advertisementData.serviceUuids.any(
+                (uuid) => uuid.toString().toLowerCase().contains("5fafc201")
+              );
+            });
+
+            if (isFound && _isScanning) {
+              FlutterBluePlus.stopScan();
+              _isScanning = false;
+              _updateStatus("Mikro Kontroler ditemukan! Silakan tekan tombol KIRIM.");
+            }
           });
         }
       });
 
       Future.delayed(const Duration(seconds: 10), () {
-        if (mounted) {
+        if (mounted && _isScanning) {
           setState(() {
             _isScanning = false;
             if (_scanResults.isEmpty) {
@@ -162,14 +175,40 @@ class _AddDevicePageState extends State<AddDevicePage> {
               await Future.delayed(const Duration(seconds: 2));
               try { await device.disconnect(); } catch (_) {}
               
-              _updateStatus("ESP32 memulai ulang. Menghubungkan WiFi...");
-              for (int j = 1; j <= 10; j++) {
+              _updateStatus("Mikro kontroler memulai ulang. Menghubungkan WiFi...");
+              bool isOnline = false;
+              String targetSsid = _ssidController.text;
+              
+              for (int j = 1; j <= 15; j++) {
                 await Future.delayed(const Duration(seconds: 1));
-                _updateStatus("Menunggu IP Address (Detik $j/10) " + ("." * (j % 4)));
+                _updateStatus("Mengecek status jaringan (Detik $j/15) " + ("." * (j % 4)));
+                
+                // Mulai mengecek Firebase setelah detik ke-5
+                if (j >= 5) {
+                   try {
+                     final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json?_=${DateTime.now().millisecondsSinceEpoch}");
+                     final request = await HttpClient().getUrl(url);
+                     final response = await request.close();
+                     if (response.statusCode == 200) {
+                        final body = await response.transform(utf8.decoder).join();
+                        if (body != "null" && body.isNotEmpty) {
+                          final data = jsonDecode(body);
+                          // Jika status wifi sudah sama dengan yang diinput
+                          if (data['wifi_ssid'] == targetSsid) {
+                             isOnline = true;
+                             break;
+                          }
+                        }
+                     }
+                   } catch (_) {} // abaikan error fetch
+                }
               }
               
-              _updateStatus("SUKSES: Selesai! ESP32 seharusnya sudah mendapat IP.");
-              _updateStatus("Silakan kembali ke halaman Dashboard untuk melihat status Online.");
+              if (isOnline) {
+                _updateStatus("SUKSES: Mikro kontroler berhasil terhubung ke jaringan '$targetSsid'!");
+              } else {
+                _updateStatus("GAGAL: Mikro kontroler tidak merespons di jaringan '$targetSsid'. Pastikan Sandi/SSID benar atau alat menyala.");
+              }
               
               if (mounted) setState(() => _isConnecting = false);
               return;
@@ -179,7 +218,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
       }
       
       if (!found) {
-        _updateStatus("GAGAL: Karakteristik BLE tidak cocok dengan alat.");
+        _updateStatus("GAGAL: Karakteristik BLE tidak cocok dengan mikro kontroler.");
         await device.disconnect();
       }
     } catch (e) {
@@ -195,7 +234,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Reset WiFi?'),
-        content: const Text('Tindakan ini akan menghapus koneksi WiFi pada ESP32. Alat akan mati lalu menyala dalam Mode Setup Bluetooth.\n\nLanjutkan?'),
+        content: const Text('Tindakan ini akan menghapus koneksi WiFi pada ESP32. Mikro Kontroler akan mati lalu menyala dalam Mode Setup Bluetooth.\n\nLanjutkan?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -220,9 +259,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 final response = await request.close();
                 if (response.statusCode == 200) {
                   _updateStatus("SUKSES: Sinyal reset diterima server!");
-                  _updateStatus("INFO: Menunggu alat merespons perintah...");
+                  _updateStatus("INFO: Menunggu mikro kontroler merespons perintah...");
                   _updateStatus("INFO: ESP32 menghapus memori WiFi dan RESTART.");
-                  _updateStatus("Silakan tunggu lampu indikator biru berkedip di alat.");
+                  _updateStatus("Silakan tunggu lampu indikator biru berkedip di mikro kontroler.");
                 } else {
                   _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
                 }
@@ -230,7 +269,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 _updateStatus("GAGAL mengirim perintah: $e");
               }
             },
-            child: const Text('RESET ALAT'),
+            child: const Text('RESET MIKRO KONTROLER'),
           ),
         ],
       ),
@@ -293,52 +332,17 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Masukkan WiFi rumah, lakukan Scan, lalu tekan "Kirim" pada alat bernama HydroSense_V2.',
+                        'Masukkan WiFi rumah, lakukan Scan, lalu tekan "Kirim" pada mikro kontroler bernama HydroSense_V2.',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade100 : Colors.blue.shade900),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-              // Peringatan Wajib Reset
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF43F5E).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF43F5E).withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.warning_amber_rounded, color: Color(0xFFF43F5E)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'PENTING: Jika ingin mengganti WiFi dari alat yang sudah terhubung, Anda WAJIB mereset alat terlebih dahulu melalui tombol di bawah ini.',
-                        style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade200 : Colors.red.shade800),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => _confirmResetWiFi(context),
-                icon: const Icon(Icons.wifi_off_rounded),
-                label: const Text('RESET WIFI', style: TextStyle(fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF43F5E),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ),
               const SizedBox(height: 24),
               
-              // Inputs
-              Text('KONEKSI ALAT', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
+              // Inputs WiFi
+              Text('KONEKSI MIKRO KONTROLER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
               const SizedBox(height: 12),
               TextField(
                 controller: _ssidController,
@@ -473,7 +477,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
                     itemBuilder: (context, index) {
                       final r = _scanResults[index];
                       final deviceName = r.advertisementData.advName.isNotEmpty ? r.advertisementData.advName : r.device.platformName;
-                      final isTarget = deviceName == "HydroSense_V2";
+                      
+                      // Cek apakah ini ESP32 milik kita berdasarkan UUID uniknya
+                      final isTarget = r.advertisementData.serviceUuids.any((uuid) => uuid.toString().toLowerCase().contains("5fafc201"));
                       
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
@@ -520,6 +526,44 @@ class _AddDevicePageState extends State<AddDevicePage> {
                       );
                     },
                   ),
+                  
+              const SizedBox(height: 48),
+              Text('PENGATURAN LANJUTAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF43F5E).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFF43F5E).withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: Color(0xFFF43F5E)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'PENTING: Jika ingin memindahkan mikro kontroler ke WiFi lain, Anda WAJIB mereset mikro kontroler terlebih dahulu melalui tombol di bawah ini.',
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade200 : Colors.red.shade800),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => _confirmResetWiFi(context),
+                icon: const Icon(Icons.wifi_off_rounded),
+                label: const Text('RESET WIFI MIKRO KONTROLER', style: TextStyle(fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFF43F5E),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+              const SizedBox(height: 32),
             ],
           ),
         ),
