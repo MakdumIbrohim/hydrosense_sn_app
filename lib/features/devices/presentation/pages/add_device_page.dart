@@ -251,17 +251,40 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands.json");
                 final httpClient = HttpClient();
                 
-                _updateStatus("Mengirim sinyal (reset_wifi: true) ke Firebase...");
+                _updateStatus("Mengirim perintah RESET ke server...");
                 final request = await httpClient.putUrl(url);
                 request.headers.set('Content-Type', 'application/json');
                 request.add(utf8.encode('{"reset_wifi": true}'));
                 
                 final response = await request.close();
                 if (response.statusCode == 200) {
-                  _updateStatus("SUKSES: Sinyal reset diterima server!");
-                  _updateStatus("INFO: Menunggu mikro kontroler merespons perintah...");
-                  _updateStatus("INFO: ESP32 menghapus memori WiFi dan RESTART.");
-                  _updateStatus("Silakan tunggu lampu indikator biru berkedip di mikro kontroler.");
+                  _updateStatus("Menunggu respons dari mikro kontroler...");
+                  
+                  bool espResponded = false;
+                  for (int j = 1; j <= 15; j++) {
+                     await Future.delayed(const Duration(seconds: 1));
+                     _updateStatus("Menunggu respons mikro kontroler (Detik $j/15) " + ("." * (j % 4)));
+                     
+                     try {
+                       final checkUrl = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands/reset_wifi.json?_=${DateTime.now().millisecondsSinceEpoch}");
+                       final checkReq = await HttpClient().getUrl(checkUrl);
+                       final checkRes = await checkReq.close();
+                       if (checkRes.statusCode == 200) {
+                          final body = await checkRes.transform(utf8.decoder).join();
+                          // Arduino akan mengubahnya jadi false saat selesai mereset
+                          if (body == "false" || body == "null") {
+                             espResponded = true;
+                             break;
+                          }
+                       }
+                     } catch (_) {}
+                  }
+                  
+                  if (espResponded) {
+                     _updateStatus("SUKSES: Mikro kontroler merespons! Memori dihapus dan sedang Restart (Lampu biru akan berkedip).");
+                  } else {
+                     _updateStatus("GAGAL: Mikro kontroler tidak merespons perintah. Pastikan alat sedang menyala dan terhubung WiFi.");
+                  }
                 } else {
                   _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
                 }
