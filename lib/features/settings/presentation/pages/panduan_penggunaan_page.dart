@@ -64,12 +64,12 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     cardColor: cardColor,
                     iconColor: const Color(0xFFF43F5E),
                     icon: Icons.wifi_off_rounded,
-                    title: '2. Mereset WiFi ESP32 (Penting)',
-                    content: 'Jika Anda ingin mengganti WiFi rumah atau memindahkan alat, Anda WAJIB menghapus memori WiFi lama pada ESP32 terlebih dahulu.\n\n'
+                    title: '2. Mereset WiFi Mikro Kontroler (Penting)',
+                    content: 'Jika Anda ingin mengganti WiFi rumah/hotspot atau memindahkan alat, Anda WAJIB menghapus memori WiFi lama pada mikro kontroler.\n\n'
                         'Ada 2 cara melakukan Reset:\n'
-                        '• Cara Jarak Jauh: Masuk ke tab "Pengaturan" -> Klik "Reset WiFi Alat (ESP32)".\n'
-                        '• Cara Fisik: Tekan dan tahan tombol "BOOT" pada mesin ESP32 selama 3 detik.\n\n'
-                        'Setelah direset, alat akan mati sebentar lalu menyala dalam Mode Bluetooth (memancarkan sinyal Bluetooth).',
+                        '• Cara Jarak Jauh: Masuk ke tab "Menu" (Ikon 4 Kotak) -> Pilih "Konfigurasi WiFi" -> Gulir ke paling bawah di bagian "Pengaturan Lanjutan" -> Klik "Reset WiFi Mikro Kontroler".\n'
+                        '• Cara Fisik: Tekan dan tahan tombol "BOOT" pada mesin mikro kontroler selama 3 detik.\n\n'
+                        'Setelah direset, mikro kontroler akan merestart dan bersiap mencari jaringan baru.',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(
@@ -78,14 +78,14 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     cardColor: cardColor,
                     iconColor: const Color(0xFF38BDF8),
                     icon: Icons.grid_view_rounded,
-                    title: '3. Menyambungkan ke WiFi Baru',
-                    content: 'Setelah alat berhasil direset (langkah 2), ikuti langkah ini:\n\n'
-                        '• Masuk ke tab "Menu" (Ikon 4 Kotak) di pojok kiri bawah.\n'
-                        '• Klik "Konfigurasi WiFi" lalu masukkan PIN Admin (Default: 123456).\n'
-                        '• Masukkan nama WiFi (SSID) dan Sandi yang baru.\n'
-                        '• Klik "Cari Perangkat Bluetooth" (Pastikan GPS/Lokasi HP menyala).\n'
-                        '• Pilih alat "HydroSense_V2" lalu klik "Kirim".\n'
-                        '• Alat akan otomatis tersambung ke WiFi baru.',
+                    title: '3. Menyambungkan ke Jaringan Baru',
+                    content: 'Setelah mikro kontroler berhasil direset (langkah 2), ikuti langkah ini:\n\n'
+                        '• Masuk ke tab "Menu" (Ikon 4 Kotak) -> "Konfigurasi WiFi".\n'
+                        '• Masukkan PIN Admin (Bawaan: 123456).\n'
+                        '• Masukkan nama WiFi atau Hotspot dari HP (Paket Internet) beserta sandinya. Pastikan sinyal Anda 2.4GHz!\n'
+                        '• Pastikan GPS/Lokasi HP menyala, lalu klik "Cari Perangkat Bluetooth".\n'
+                        '• Mikro kontroler akan terdeteksi (Warna Biru), lalu klik "Kirim".\n'
+                        '• Sistem akan otomatis mengecek 15 detik apakah koneksi berhasil.',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(
@@ -95,8 +95,8 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     iconColor: const Color(0xFF8B5CF6),
                     icon: Icons.memory_rounded,
                     title: '4. Memantau Status Perangkat',
-                    content: 'Untuk melihat alat apa saja yang terdaftar di sistem, masuk ke tab "Perangkat" (Ikon Chip/Memori).\n\n'
-                        'Di sini Anda bisa memantau apakah alat (contoh: HydroSense Node 1) sedang aktif mengirim data (Online) atau mati (Offline).',
+                    content: 'Untuk melihat mikro kontroler apa saja yang terdaftar di sistem, masuk ke tab "Daftar Perangkat" (Ikon Chip/Memori di bawah).\n\n'
+                        'Di sini Anda bisa memantau apakah mikro kontroler (contoh: HydroSense Node 1) sedang aktif mengirim data (Online/Hijau) atau mati (Offline/Abu-abu).',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(
@@ -108,10 +108,10 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     title: '5. Mengkalibrasi Sensor',
                     content: 'Seiring berjalannya waktu, sensor pH atau TDS mungkin akan kurang akurat.\n\n'
                         'Langkah-langkah:\n'
-                        '• Masuk ke tab "Perangkat".\n'
-                        '• Klik ikon "Pengaturan/Kalibrasi" di sebelah nama alat.\n'
-                        '• Ikuti instruksi pencelupan sensor ke air kalibrasi baku.\n'
-                        '• Simpan nilai kalibrasi yang baru (Fitur dalam pengembangan).',
+                        '• Masuk ke tab "Menu" (Ikon 4 Kotak).\n'
+                        '• Klik tombol "Kalibrasi TDS" atau "Kalibrasi pH".\n'
+                        '• Masukkan nilai koreksi (K-Value) yang tepat sesuai kondisi kepekatan air.\n'
+                        '• Simpan nilai kalibrasi yang baru ke server.',
                   ),
                   const SizedBox(height: 32),
                 ],
