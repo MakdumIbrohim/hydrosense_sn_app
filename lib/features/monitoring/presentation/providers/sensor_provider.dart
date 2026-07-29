@@ -10,6 +10,9 @@ class SensorProvider extends ChangeNotifier {
   SensorData? _currentData;
   bool _isLoading = true;
   final List<double> _ecHistory = [];
+  final List<double> _phHistory = [];
+  final List<double> _tdsHistory = [];
+  final List<double> _tempHistory = [];
   
   MqttServerClient? _mqttClient;
   final String _broker = 'broker.emqx.io';
@@ -19,6 +22,9 @@ class SensorProvider extends ChangeNotifier {
   SensorData? get currentData => _currentData;
   bool get isLoading => _isLoading;
   List<double> get ecHistory => _ecHistory;
+  List<double> get phHistory => _phHistory;
+  List<double> get tdsHistory => _tdsHistory;
+  List<double> get tempHistory => _tempHistory;
 
   SensorProvider() {
     _initMqtt();
@@ -64,8 +70,14 @@ class SensorProvider extends ChangeNotifier {
           
           if (_ecHistory.length >= 20) {
             _ecHistory.removeAt(0);
+            _phHistory.removeAt(0);
+            _tdsHistory.removeAt(0);
+            _tempHistory.removeAt(0);
           }
           _ecHistory.add(_currentData!.ec);
+          _phHistory.add(_currentData!.ph);
+          _tdsHistory.add(_currentData!.tds);
+          _tempHistory.add(_currentData!.waterTemperature);
           
           _isLoading = false;
           notifyListeners();

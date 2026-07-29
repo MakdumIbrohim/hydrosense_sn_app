@@ -4,8 +4,19 @@ import '../../../../core/constants/app_colors.dart';
 
 class ChartWidget extends StatelessWidget {
   final List<double> history;
+  final String title;
+  final String unit;
+  final IconData icon;
+  final List<Color> colors;
   
-  const ChartWidget({super.key, required this.history});
+  const ChartWidget({
+    super.key, 
+    required this.history,
+    required this.title,
+    required this.unit,
+    required this.icon,
+    required this.colors,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,12 +48,12 @@ class ChartWidget extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: const Color(0xFF34D399).withValues(alpha: 0.1), shape: BoxShape.circle),
-                  child: const Icon(Icons.show_chart_rounded, color: Color(0xFF34D399)),
+                  decoration: BoxDecoration(color: colors.last.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: Icon(icon, color: colors.last),
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Tren Nutrisi (EC)',
+                  title,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                 ),
               ],
@@ -84,7 +95,7 @@ class ChartWidget extends StatelessWidget {
                       getTooltipItems: (List<LineBarSpot> touchedSpots) {
                         return touchedSpots.map((touchedSpot) {
                           return LineTooltipItem(
-                            '${touchedSpot.y.toStringAsFixed(2)} mS',
+                            '${touchedSpot.y.toStringAsFixed(2)} $unit',
                             const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
                           );
                         }).toList();
@@ -95,8 +106,8 @@ class ChartWidget extends StatelessWidget {
                     LineChartBarData(
                       spots: spots,
                       isCurved: true,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF38BDF8), Color(0xFF34D399)],
+                      gradient: LinearGradient(
+                        colors: colors,
                       ),
                       barWidth: 4,
                       isStrokeCapRound: true,
@@ -105,8 +116,8 @@ class ChartWidget extends StatelessWidget {
                         show: true,
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFF38BDF8).withValues(alpha: 0.2),
-                            const Color(0xFF34D399).withValues(alpha: 0.0),
+                            colors.first.withValues(alpha: 0.2),
+                            colors.last.withValues(alpha: 0.0),
                           ],
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,

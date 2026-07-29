@@ -5,6 +5,7 @@ import '../../features/devices/presentation/pages/add_device_page.dart';
 import '../../features/devices/presentation/pages/calibrate_page.dart';
 import '../../features/devices/presentation/pages/device_list_page.dart';
 import '../../features/monitoring/presentation/pages/dashboard_page.dart';
+import '../../features/monitoring/presentation/pages/graph_history_page.dart'; // Import baru
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
 import '../../features/settings/presentation/pages/tentang_kami_page.dart';
@@ -12,12 +13,12 @@ import '../../features/settings/presentation/pages/panduan_penggunaan_page.dart'
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 
 import '../../features/devices/presentation/pages/menu_page.dart';
-
 import '../../features/devices/presentation/pages/device_features_page.dart';
 
 class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String dashboard = '/';
+  static const String graphHistory = '/graphs'; // Route baru
   static const String menu = '/menu';
   static const String settings = '/settings';
   static const String tentangKami = '/settings/tentang-kami';
@@ -64,6 +65,12 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.dashboard,
                 builder: (context, state) => const DashboardPage(),
+                routes: [
+                  GoRoute(
+                    path: 'graphs',
+                    builder: (context, state) => const GraphHistoryPage(),
+                  ),
+                ],
               ),
             ],
           ),
