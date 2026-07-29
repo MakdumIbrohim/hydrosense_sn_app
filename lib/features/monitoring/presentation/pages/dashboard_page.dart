@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../widgets/sensor_card_widget.dart';
@@ -161,8 +162,31 @@ class DashboardPage extends StatelessWidget {
                         color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
                       ),
                     ),
+                    ChartWidget(
+                      history: provider.ecHistory,
+                      title: 'Tren Nutrisi (EC)',
+                      unit: 'mS/cm',
+                      icon: Icons.show_chart_rounded,
+                      colors: const [Color(0xFF38BDF8), Color(0xFF34D399)],
+                    ),
                     const SizedBox(height: 16),
-                    ChartWidget(history: provider.ecHistory),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.analytics_rounded),
+                        label: const Text('Lihat Semua Grafik Riwayat Sensor', style: TextStyle(fontWeight: FontWeight.bold)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: () {
+                          // Gunakan GoRouter jika Anda memakai go_router
+                          context.push('/graphs'); 
+                        },
+                      ),
+                    ),
                     const SizedBox(height: 32),
                   ],
                 ),
