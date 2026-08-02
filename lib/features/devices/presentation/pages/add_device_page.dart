@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
 
 class AddDevicePage extends StatefulWidget {
   const AddDevicePage({super.key});
@@ -362,13 +365,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
               const SizedBox(height: 32),
 
               // Info Box
-              Container(
+              NeumorphicContainer(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
-                ),
+                borderRadius: 16,
                 child: Row(
                   children: [
                     const Icon(Icons.info_outline_rounded, color: Color(0xFF38BDF8)),
@@ -387,40 +386,46 @@ class _AddDevicePageState extends State<AddDevicePage> {
               // Inputs WiFi
               Text('KONEKSI MIKRO KONTROLER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
               const SizedBox(height: 12),
-              TextField(
-                controller: _ssidController,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Nama WiFi / Hotspot (SSID)',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                  prefixIcon: const Icon(Icons.wifi_rounded, color: Colors.grey),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: TextField(
+                  controller: _ssidController,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Nama WiFi / Hotspot (SSID)',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.wifi_rounded, color: Colors.grey),
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _passController,
-                obscureText: _isObscure,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Password WiFi / Hotspot',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                  prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                      color: Colors.grey,
+              const SizedBox(height: 16),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: TextField(
+                  controller: _passController,
+                  obscureText: _isObscure,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Password WiFi / Hotspot',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                      });
-                    },
                   ),
                 ),
               ),
