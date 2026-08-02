@@ -344,12 +344,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
               // HEADER
               Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 12,
                     child: IconButton(
                       icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       onPressed: () => Navigator.pop(context),
@@ -431,53 +427,40 @@ class _AddDevicePageState extends State<AddDevicePage> {
               ),
               const SizedBox(height: 24),
               
-              // Tombol Scan
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    if (!_isScanning && !_isConnecting)
-                      BoxShadow(color: const Color(0xFF34D399).withValues(alpha: 0.3), blurRadius: 16, spreadRadius: 2, offset: const Offset(0, 4)),
-                  ],
+              NeumorphicContainer(
+                borderRadius: 16,
+                isPressed: _isScanning || _isConnecting,
+                child: InkWell(
+                  onTap: _isScanning || _isConnecting ? null : _startScan,
                   borderRadius: BorderRadius.circular(16),
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: _isScanning || _isConnecting ? null : _startScan,
-                  icon: _isScanning 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                    : const Icon(Icons.bluetooth_searching_rounded),
-                  label: Text(_isScanning ? 'MENCARI...' : 'CARI PERANGKAT BLUETOOTH', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF34D399),
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade300,
-                    disabledForegroundColor: Colors.grey.shade500,
-                    elevation: 0,
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _isScanning 
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Color(0xFF34D399), strokeWidth: 2)) 
+                          : const Icon(Icons.bluetooth_searching_rounded, color: Color(0xFF34D399)),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isScanning ? 'MENCARI...' : 'CARI PERANGKAT BLUETOOTH', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            letterSpacing: 1, 
+                            color: (_isScanning || _isConnecting) ? Colors.grey : const Color(0xFF34D399)
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               
               if (_statusMessage.isNotEmpty)
-                Container(
+                NeumorphicContainer(
                   margin: const EdgeInsets.symmetric(vertical: 16.0),
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _isError 
-                        ? const Color(0xFFF43F5E).withValues(alpha: 0.1) 
-                        : _isSuccess 
-                            ? const Color(0xFF34D399).withValues(alpha: 0.1)
-                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _isError 
-                          ? const Color(0xFFF43F5E).withValues(alpha: 0.3)
-                          : _isSuccess
-                              ? const Color(0xFF34D399).withValues(alpha: 0.3)
-                              : Colors.transparent,
-                    ),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                  ),
+                  borderRadius: 16,
                   child: Row(
                     children: [
                       if (!_isError && !_isSuccess && (_isScanning || _isConnecting || _statusMessage.contains("Menunggu") || _statusMessage.contains("menghubungkan")))
@@ -540,19 +523,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
                       // Cek secara dinamis berdasarkan UUID uniknya
                       final isTarget = r.advertisementData.serviceUuids.any((uuid) => uuid.toString().toLowerCase().contains("5fafc201"));
                       
-                      return Container(
+                      return NeumorphicContainer(
                         margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: isTarget 
-                              ? (isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.1) : const Color(0xFF38BDF8).withValues(alpha: 0.05)) 
-                              : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isTarget ? const Color(0xFF38BDF8) : Colors.transparent,
-                            width: 1.5
-                          ),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                        ),
+                        borderRadius: 16,
                         child: Material(
                           color: Colors.transparent,
                           child: ListTile(
@@ -589,13 +562,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
               const SizedBox(height: 48),
               Text('PENGATURAN LANJUTAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
               const SizedBox(height: 12),
-              Container(
+              NeumorphicContainer(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF43F5E).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF43F5E).withValues(alpha: 0.3)),
-                ),
+                borderRadius: 16,
                 child: Row(
                   children: [
                     const Icon(Icons.warning_amber_rounded, color: Color(0xFFF43F5E)),
@@ -610,16 +579,29 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 ),
               ),
               const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => _confirmResetWiFi(context),
-                icon: const Icon(Icons.wifi_off_rounded),
-                label: const Text('RESET WIFI MIKRO KONTROLER', style: TextStyle(fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF43F5E),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: InkWell(
+                  onTap: () => _confirmResetWiFi(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off_rounded, color: Color(0xFFF43F5E)),
+                        SizedBox(width: 8),
+                        Text(
+                          'RESET WIFI MIKRO KONTROLER', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            letterSpacing: 1, 
+                            color: Color(0xFFF43F5E)
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 32),

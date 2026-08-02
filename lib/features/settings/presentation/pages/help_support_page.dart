@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
+
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
       
@@ -19,12 +20,8 @@ class HelpSupportPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 12,
                     child: IconButton(
                       icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       onPressed: () => Navigator.pop(context),
@@ -43,12 +40,8 @@ class HelpSupportPage extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 16,
                     child: Material(
                       color: Colors.transparent,
                       child: Column(
@@ -65,13 +58,9 @@ class HelpSupportPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   
                   Text('LEGAL', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  const SizedBox(height: 16),
+                  NeumorphicContainer(
+                    borderRadius: 16,
                     child: Material(
                       color: Colors.transparent,
                       child: Column(

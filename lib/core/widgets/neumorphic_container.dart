@@ -7,6 +7,7 @@ class NeumorphicContainer extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
   final double borderRadius;
   final bool isPressed;
+  final Color? color;
 
   const NeumorphicContainer({
     super.key,
@@ -15,12 +16,13 @@ class NeumorphicContainer extends StatelessWidget {
     this.margin,
     this.borderRadius = 20.0,
     this.isPressed = false,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.neumoBgDark : AppColors.neumoBg;
+    final bgColor = color ?? (isDark ? AppColors.neumoBgDark : AppColors.neumoBg);
 
     return Container(
       margin: margin,

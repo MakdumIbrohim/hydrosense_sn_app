@@ -1,3 +1,4 @@
+import "../../../../core/widgets/neumorphic_container.dart";
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -170,21 +171,28 @@ class DashboardPage extends StatelessWidget {
                       colors: const [Color(0xFF38BDF8), Color(0xFF34D399)],
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.analytics_rounded),
-                        label: const Text('Lihat Semua Grafik Riwayat Sensor', style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    NeumorphicContainer(
+                      borderRadius: 16,
+                      child: InkWell(
+                        onTap: () => context.push('/graphs'),
+                        borderRadius: BorderRadius.circular(16),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.analytics_rounded, color: Color(0xFF1F837B)),
+                              SizedBox(width: 8),
+                              Text(
+                                'Lihat Semua Grafik Riwayat Sensor',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1F837B),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        onPressed: () {
-                          // Gunakan GoRouter jika Anda memakai go_router
-                          context.push('/graphs'); 
-                        },
                       ),
                     ),
                     const SizedBox(height: 32),
