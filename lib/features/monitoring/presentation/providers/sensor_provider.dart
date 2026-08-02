@@ -9,6 +9,7 @@ import '../../domain/entities/sensor_data.dart';
 class SensorProvider extends ChangeNotifier {
   SensorData? _currentData;
   bool _isLoading = true;
+  String _connectionMessage = 'Menginisialisasi sistem...';
   final List<double> _ecHistory = [];
   final List<double> _phHistory = [];
   final List<double> _tdsHistory = [];
@@ -21,6 +22,7 @@ class SensorProvider extends ChangeNotifier {
 
   SensorData? get currentData => _currentData;
   bool get isLoading => _isLoading;
+  String get connectionMessage => _connectionMessage;
   List<double> get ecHistory => _ecHistory;
   List<double> get phHistory => _phHistory;
   List<double> get tdsHistory => _tdsHistory;
@@ -39,14 +41,20 @@ class SensorProvider extends ChangeNotifier {
     _mqttClient!.onConnected = _onConnected;
     
     try {
-      debugPrint('Menyambungkan ke Broker EMQX...');
+      _connectionMessage = 'Menyambungkan ke Broker EMQX...';
+      notifyListeners();
+      debugPrint(_connectionMessage);
       await _mqttClient!.connect();
     } catch (e) {
-      debugPrint('Gagal connect: $e');
+      _connectionMessage = 'Gagal terhubung: $e';
+      notifyListeners();
+      debugPrint(_connectionMessage);
       _mqttClient!.disconnect();
     }
 
     if (_mqttClient!.connectionStatus!.state == MqttConnectionState.connected) {
+      _connectionMessage = 'Tersambung ke server. Menunggu data...';
+      notifyListeners();
       debugPrint('Berhasil tersambung ke EMQX!');
       _mqttClient!.subscribe(_topic, MqttQos.atMostOnce);
 
@@ -80,6 +88,7 @@ class SensorProvider extends ChangeNotifier {
           _tempHistory.add(_currentData!.waterTemperature);
           
           _isLoading = false;
+          _connectionMessage = 'Data diterima.';
           notifyListeners();
         } catch (e) {
           debugPrint('Error memproses data MQTT: $e');
@@ -89,21 +98,29 @@ class SensorProvider extends ChangeNotifier {
   }
 
   void _onConnected() {
+    _connectionMessage = 'Terkoneksi ke server.';
+    notifyListeners();
     debugPrint('Terkoneksi ke EMQX');
   }
 
   void _onDisconnected() {
+    _connectionMessage = 'Koneksi terputus. Mencoba menyambung kembali...';
+    _isLoading = true;
+    notifyListeners();
     debugPrint('Terputus dari EMQX. Mencoba menyambung kembali...');
     Future.delayed(const Duration(seconds: 5), _initMqtt);
   }
 
   Future<void> refreshData() async {
-    // Karena MQTT Realtime (terlempar langsung oleh server), refresh hanya untuk cek koneksi
     _isLoading = true;
+    _connectionMessage = 'Memeriksa koneksi server...';
     notifyListeners();
     if (_mqttClient?.connectionStatus?.state != MqttConnectionState.connected) {
       await _initMqtt();
     } else {
+      _connectionMessage = 'Koneksi stabil. Menunggu pembaruan data...';
+      // Kita beri sedikit delay agar skeleton loading terlihat bahwa sistem bekerja
+      await Future.delayed(const Duration(milliseconds: 800));
       _isLoading = false;
       notifyListeners();
     }

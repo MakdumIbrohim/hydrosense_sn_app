@@ -22,7 +22,7 @@ class DashboardPage extends StatelessWidget {
         child: Consumer<SensorProvider>(
           builder: (context, provider, child) {
             if (provider.isLoading && provider.currentData == null) {
-              return _buildSkeletonLoading(isDark);
+              return _buildSkeletonLoading(isDark, provider.connectionMessage);
             }
 
             final data = provider.currentData;
@@ -206,7 +206,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSkeletonLoading(bool isDark) {
+  Widget _buildSkeletonLoading(bool isDark, String message) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: Column(
@@ -228,7 +228,35 @@ class DashboardPage extends StatelessWidget {
               const SkeletonWidget(width: 48, height: 48, borderRadius: 12),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 16, height: 16, 
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF38BDF8))
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: Color(0xFF38BDF8),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           const SkeletonWidget(width: 130, height: 14, borderRadius: 4),
           const SizedBox(height: 16),
           GridView.count(
