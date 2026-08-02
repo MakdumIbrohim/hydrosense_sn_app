@@ -33,11 +33,28 @@ class ChartWidget extends StatelessWidget {
       }
     }
 
+    final bgColor = isDark ? AppColors.neumoBgDark : AppColors.neumoBg;
+
     return Container(
       decoration: BoxDecoration(
-        color: cardColor,
+        color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          // Shadow Terang (Kiri Atas)
+          BoxShadow(
+            color: isDark ? AppColors.neumoShadowLightDark : AppColors.neumoShadowLight,
+            offset: const Offset(-4, -4),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+          // Shadow Gelap (Kanan Bawah)
+          BoxShadow(
+            color: isDark ? AppColors.neumoShadowDarkDark : AppColors.neumoShadowDark,
+            offset: const Offset(4, 4),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),

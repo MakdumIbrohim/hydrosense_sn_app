@@ -10,7 +10,7 @@ class AppTheme {
       seedColor: AppColors.primary,
       brightness: Brightness.light,
     ),
-    scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+    scaffoldBackgroundColor: AppColors.neumoBg,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -24,9 +24,9 @@ class AppTheme {
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.primary,
       brightness: Brightness.dark,
-      surface: const Color(0xFF1E293B), // Sleek tile color
+      surface: AppColors.neumoBgDark, // Sleek tile color
     ),
-    scaffoldBackgroundColor: const Color(0xFF0F172A),
+    scaffoldBackgroundColor: AppColors.neumoBgDark,
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,

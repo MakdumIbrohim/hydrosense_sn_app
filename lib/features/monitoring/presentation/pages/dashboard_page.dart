@@ -16,7 +16,7 @@ class DashboardPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? AppColors.neumoBgDark : AppColors.neumoBg,
       body: SafeArea(
         child: Consumer<SensorProvider>(
           builder: (context, provider, child) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-
+import '../../../../core/constants/app_colors.dart';
 class SensorCardWidget extends StatelessWidget {
   final String title;
   final String value;
@@ -27,14 +27,29 @@ class SensorCardWidget extends StatelessWidget {
     if (percent > 1) percent = 1;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final bgColor = isDark ? AppColors.neumoBgDark : AppColors.neumoBg;
     final trackColor = isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.15);
 
     return Container(
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          // Shadow Terang (Kiri Atas)
+          BoxShadow(
+            color: isDark ? AppColors.neumoShadowLightDark : AppColors.neumoShadowLight,
+            offset: const Offset(-4, -4),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+          // Shadow Gelap (Kanan Bawah)
+          BoxShadow(
+            color: isDark ? AppColors.neumoShadowDarkDark : AppColors.neumoShadowDark,
+            offset: const Offset(4, 4),
+            blurRadius: 10,
+            spreadRadius: 1,
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -12,7 +12,7 @@ class GraphHistoryPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       appBar: AppBar(
         title: Text('Riwayat Grafik Sensor', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,

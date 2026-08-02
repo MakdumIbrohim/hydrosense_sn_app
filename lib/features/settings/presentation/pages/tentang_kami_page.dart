@@ -9,7 +9,7 @@ class TentangKamiPage extends StatelessWidget {
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       body: SafeArea(
         child: Column(
           children: [

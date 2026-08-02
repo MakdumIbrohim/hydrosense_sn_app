@@ -1,3 +1,4 @@
+import "../../../../core/widgets/neumorphic_container.dart";
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -105,7 +106,7 @@ class DeviceListPage extends StatelessWidget {
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -162,19 +163,8 @@ class DeviceListPage extends StatelessWidget {
     required bool isOnline,
     required VoidCallback onCalibrate,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-        border: Border.all(color: isOnline ? (isDark ? Colors.transparent : Colors.green.withValues(alpha: 0.3)) : Colors.transparent),
-      ),
+    return NeumorphicContainer(
+      borderRadius: 20,
       child: Material(
         color: Colors.transparent,
         child: ListTile(
