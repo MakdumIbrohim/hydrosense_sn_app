@@ -8,9 +8,23 @@ import '../widgets/sensor_card_widget.dart';
 import '../widgets/chart_widget.dart';
 import '../widgets/skeleton_widget.dart';
 import '../providers/sensor_provider.dart';
+import '../../../../core/services/update_service.dart'; // Import service update
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkForUpdates(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
