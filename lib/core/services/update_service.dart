@@ -127,6 +127,11 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
   bool isDownloading = false;
   double progress = 0.0;
   String progressString = "0%";
+  String downloadStats = "Menyiapkan...";
+  String downloadSpeed = "0.0 MB/s";
+  int _lastReceived = 0;
+  DateTime? _lastTime;
+  CancelToken? _cancelToken;
 
   Future<void> _startDownload() async {
     // Meminta izin storage khusus Android lama, Android baru pakai folder app khusus tidak perlu,
@@ -135,6 +140,11 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
       isDownloading = true;
       progress = 0.0;
       progressString = "0%";
+      downloadStats = "Menyiapkan...";
+      downloadSpeed = "0.0 MB/s";
+      _lastReceived = 0;
+      _lastTime = DateTime.now();
+      _cancelToken = CancelToken();
     });
 
     try {
@@ -145,11 +155,24 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
       await dio.download(
         widget.downloadUrl,
         savePath,
+        cancelToken: _cancelToken,
         onReceiveProgress: (received, total) {
           if (total != -1) {
+            DateTime now = DateTime.now();
+            int timeDiff = now.difference(_lastTime!).inMilliseconds;
+            
+            if (timeDiff > 500) {
+              int bytesDiff = received - _lastReceived;
+              double speedMbps = (bytesDiff / 1024 / 1024) / (timeDiff / 1000);
+              downloadSpeed = "${speedMbps.toStringAsFixed(1)} MB/s";
+              _lastTime = now;
+              _lastReceived = received;
+            }
+
             setState(() {
               progress = received / total;
               progressString = "${(progress * 100).toStringAsFixed(0)}%";
+              downloadStats = "${(received / 1024 / 1024).toStringAsFixed(2)} MB / ${(total / 1024 / 1024).toStringAsFixed(2)} MB";
             });
           }
         },
@@ -166,6 +189,11 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
         Navigator.pop(context); // Tutup dialog setelah berhasil
       }
     } catch (e) {
+      if (e is DioException && CancelToken.isCancel(e)) {
+        debugPrint("Download dibatalkan");
+        return;
+      }
+      
       setState(() {
         isDownloading = false;
       });
@@ -207,7 +235,7 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
             
             if (!isDownloading) ...[
               Container(
-                height: 120,
+                constraints: const BoxConstraints(maxHeight: 350, minHeight: 120),
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -230,7 +258,7 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Nanti', style: TextStyle(color: Colors.grey)),
+                      child: const Text('Nanti', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -270,9 +298,35 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
                   valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF38BDF8)),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(progressString, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(downloadStats, style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade600, fontSize: 13)),
+                  Text(progressString, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Text(downloadSpeed, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34D399), fontSize: 13)),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    _cancelToken?.cancel("Dibatalkan pengguna");
+                    setState(() { isDownloading = false; });
+                  },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.red.withOpacity(0.1),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text('Batal', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+              ),
             ]
           ],
         ),

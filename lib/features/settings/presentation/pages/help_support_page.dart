@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
 import '../../../../core/widgets/neumorphic_container.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
@@ -85,16 +86,19 @@ class HelpSupportPage extends StatelessWidget {
   void _showContactOptions(BuildContext context, bool isDark) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
             children: [
               Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24), decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(2))),
               Text('Hubungi Developer', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
@@ -102,13 +106,13 @@ class HelpSupportPage extends StatelessWidget {
               NeumorphicContainer(
                 borderRadius: 16,
                 child: ListTile(
-                  leading: const Icon(Icons.chat_rounded, color: Color(0xFF25D366)),
+                  leading: const FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 28),
                   title: Text('WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
-                  subtitle: const Text('+62 851-7744-8544'),
+                  subtitle: Text('+62 851-7744-8544', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
                   trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
-                  onTap: () async {
+                  onTap: () {
                     final uri = Uri.parse('https://wa.me/6285177448544?text=Halo%20Developer%20HydroSense');
-                    if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    launchUrl(uri, mode: LaunchMode.externalApplication);
                   },
                 ),
               ),
@@ -116,19 +120,21 @@ class HelpSupportPage extends StatelessWidget {
               NeumorphicContainer(
                 borderRadius: 16,
                 child: ListTile(
-                  leading: const Icon(Icons.email_rounded, color: Color(0xFFEA4335)),
+                  leading: const Icon(Icons.email_rounded, color: Color(0xFFEA4335), size: 28),
                   title: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
-                  subtitle: const Text('makdumibrohim28@gmail.com'),
+                  subtitle: Text('makdumibrohim28@gmail.com', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
                   trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
-                  onTap: () async {
+                  onTap: () {
                     final uri = Uri.parse('mailto:makdumibrohim28@gmail.com?subject=Bantuan%20Aplikasi%20HydroSense');
-                    if (await canLaunchUrl(uri)) await launchUrl(uri);
+                    launchUrl(uri, mode: LaunchMode.externalApplication); // Mode external agar aplikasi Gmail langsung terbuka
                   },
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 100), // Jarak ekstra agar tidak tertutup floating bottom bar
             ],
           ),
+        ),
+        ),
         );
       }
     );

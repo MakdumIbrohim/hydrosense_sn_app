@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class TentangKamiPage extends StatelessWidget {
   const TentangKamiPage({super.key});
@@ -71,10 +72,16 @@ class TentangKamiPage extends StatelessWidget {
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                     ),
                     const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(color: const Color(0xFFA78BFA).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                      child: const Text('Versi 1.0.0', style: TextStyle(color: Color(0xFFA78BFA), fontWeight: FontWeight.bold, fontSize: 12)),
+                    FutureBuilder<PackageInfo>(
+                      future: PackageInfo.fromPlatform(),
+                      builder: (context, snapshot) {
+                        final version = snapshot.hasData ? snapshot.data!.version : '...';
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(color: const Color(0xFFA78BFA).withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                          child: Text('Versi $version', style: const TextStyle(color: Color(0xFFA78BFA), fontWeight: FontWeight.bold, fontSize: 12)),
+                        );
+                      }
                     ),
                     const SizedBox(height: 40),
                     
@@ -112,9 +119,9 @@ class TentangKamiPage extends StatelessWidget {
                           SizedBox(
                             width: double.infinity,
                             child: TextButton.icon(
-                              onPressed: () async {
+                              onPressed: () {
                                 final uri = Uri.parse('https://maps.app.goo.gl/drPZEu7djCg8TYxJA');
-                                if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                launchUrl(uri, mode: LaunchMode.externalApplication);
                               },
                               icon: const Icon(Icons.location_on_rounded, color: Colors.white, size: 18),
                               label: const Text('Buka di Google Maps', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -169,9 +176,9 @@ class TentangKamiPage extends StatelessWidget {
                     Column(
                       children: [
                         TextButton.icon(
-                          onPressed: () async {
+                          onPressed: () {
                             final uri = Uri.parse('https://www.instagram.com/kknposko1_sumbernangka?igsh=ZmsyZHphdzN1ejk2');
-                            if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            launchUrl(uri, mode: LaunchMode.externalApplication);
                           },
                           icon: const FaIcon(FontAwesomeIcons.instagram, size: 20, color: Color(0xFFE1306C)),
                           label: Text('@kknposko1_sumbernangka', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
@@ -183,9 +190,9 @@ class TentangKamiPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         TextButton.icon(
-                          onPressed: () async {
+                          onPressed: () {
                             final uri = Uri.parse('https://www.tiktok.com/@kknposko1sumbernangka?_r=1&_t=ZS-98ZS4ddoX2K');
-                            if (await canLaunchUrl(uri)) await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            launchUrl(uri, mode: LaunchMode.externalApplication);
                           },
                           icon: FaIcon(FontAwesomeIcons.tiktok, size: 18, color: isDark ? Colors.white : Colors.black),
                           label: Text('@kknposko1sumbernangka', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
