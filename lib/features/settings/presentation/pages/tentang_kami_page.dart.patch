@@ -1,0 +1,115 @@
+--- lib/features/settings/presentation/pages/tentang_kami_page.dart
++++ lib/features/settings/presentation/pages/tentang_kami_page.dart
+@@ -97,20 +97,80 @@
+                     // Section 3: Tim KKN
+                     _buildSectionTitle('HASIL LUARAN KKN TIM IOT', isDark),
+                     const SizedBox(height: 8),
+-                    _buildDivisionCard('Informasi Umum', 'Instansi: Universitas Islam Madura\nDesa: Sumber Nangka', isDark, cardColor, Icons.info_outline_rounded, const Color(0xFF38BDF8)),
++                    
++                    // Card Informasi Umum Spesial
++                    Container(
++                      width: double.infinity,
++                      decoration: BoxDecoration(
++                        color: cardColor,
++                        borderRadius: BorderRadius.circular(20),
++                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
++                      ),
++                      padding: const EdgeInsets.all(20.0),
++                      child: Column(
++                        crossAxisAlignment: CrossAxisAlignment.start,
++                        children: [
++                          _buildTeamRow('Instansi', 'Universitas Islam Madura', isDark),
++                          _buildTeamRow('Desa', 'Sumber Nangka', isDark),
++                        ],
++                      ),
++                    ),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('1. DPL', '• (Menyusul)\n• (Menyusul)\n• (Menyusul)', isDark, cardColor, Icons.school_rounded, const Color(0xFFA78BFA)),
++                    _buildModernDivisionCard('1. DPL', isDark, cardColor, Icons.school_rounded, const Color(0xFFA78BFA), [
++                      {'name': '(Menyusul)', 'role': 'DPL 1'},
++                      {'name': '(Menyusul)', 'role': 'DPL 2'},
++                      {'name': '(Menyusul)', 'role': 'DPL 3'},
++                    ]),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('2. BPH TEAM', '• Iqbal Asmoro (Kordes)\n• St Aisyah (Bendahara)\n• Tamara Adjuah (Sekretaris)', isDark, cardColor, Icons.manage_accounts_rounded, const Color(0xFFF43F5E)),
++                    _buildModernDivisionCard('2. BPH TEAM', isDark, cardColor, Icons.manage_accounts_rounded, const Color(0xFFF43F5E), [
++                      {'name': 'Iqbal Asmoro', 'role': 'Kordes'},
++                      {'name': 'St Aisyah', 'role': 'Bendahara'},
++                      {'name': 'Tamara Adjuah', 'role': 'Sekretaris'},
++                    ]),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('3. HUMAS TEAM', '• Aydi Sofyan (Pubdekdok)\n• Muslimah Qurniawati (Pubdekdok)\n• Fitri Aulia (Publikasi)', isDark, cardColor, Icons.campaign_rounded, const Color(0xFFFB923C)),
++                    _buildModernDivisionCard('3. HUMAS TEAM', isDark, cardColor, Icons.campaign_rounded, const Color(0xFFFB923C), [
++                      {'name': 'Aydi Sofyan', 'role': 'Pubdekdok'},
++                      {'name': 'Muslimah Qurniawati', 'role': 'Pubdekdok'},
++                      {'name': 'Fitri Aulia', 'role': 'Publikasi'},
++                    ]),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('4. GREEN HOUSE TEAM', '• Moh. Al Fredi Subakti (CO)\n• Nahiri (Team)\n• Moh Idris (Team)\n• Willy Alivia Ramadlani (Team)', isDark, cardColor, Icons.eco_rounded, const Color(0xFF34D399)),
++                    _buildModernDivisionCard('4. GREEN HOUSE TEAM', isDark, cardColor, Icons.eco_rounded, const Color(0xFF34D399), [
++                      {'name': 'Moh. Al Fredi Subakti', 'role': 'CO'},
++                      {'name': 'Nahiri', 'role': 'Team'},
++                      {'name': 'Moh Idris', 'role': 'Team'},
++                      {'name': 'Willy Alivia Ramadlani', 'role': 'Team'},
++                    ]),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('5. IMT TEAM', '• Siti Aisyah (Team)\n• Mar\'atul Camilia (Team)', isDark, cardColor, Icons.biotech_rounded, const Color(0xFF38BDF8)),
++                    _buildModernDivisionCard('5. IMT TEAM', isDark, cardColor, Icons.biotech_rounded, const Color(0xFF38BDF8), [
++                      {'name': 'Siti Aisyah', 'role': 'Team'},
++                      {'name': 'Mar\'atul Camilia', 'role': 'Team'},
++                    ]),
+                     const SizedBox(height: 12),
+-                    _buildDivisionCard('6. IOT TEAM', '• Makdum Ibrohim (CO)\n• Addis Rofik Erlangga (Team)\n• Dimas Bagas Firmansyah Arifin (Team)\n• Nabil Qistubillah (Team)\n• Fina Nurul Layali (Team)', isDark, cardColor, Icons.memory_rounded, const Color(0xFFEAB308)),
++                    _buildModernDivisionCard('6. IOT TEAM', isDark, cardColor, Icons.memory_rounded, const Color(0xFFEAB308), [
++                      {'name': 'Makdum Ibrohim', 'role': 'CO'},
++                      {'name': 'Addis Rofik Erlangga', 'role': 'Team'},
++                      {'name': 'Dimas Bagas Firmansyah Arifin', 'role': 'Team'},
++                      {'name': 'Nabil Qistubillah', 'role': 'Team'},
++                      {'name': 'Fina Nurul Layali', 'role': 'Team'},
++                    ]),
+                     const SizedBox(height: 24),
+@@ -213,7 +273,7 @@
+     );
+   }
+ 
+-  Widget _buildDivisionCard(String title, String members, bool isDark, Color cardColor, IconData icon, Color iconColor) {
++  Widget _buildModernDivisionCard(String title, bool isDark, Color cardColor, IconData icon, Color iconColor, List<Map<String, String>> members) {
+     return Container(
+       width: double.infinity,
+       decoration: BoxDecoration(
+@@ -239,9 +299,29 @@
+               ],
+             ),
+             const SizedBox(height: 16),
+-            Text(
+-              members,
+-              style: TextStyle(height: 1.6, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
++            Column(
++              children: members.map((m) => Container(
++                margin: const EdgeInsets.only(bottom: 8),
++                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
++                decoration: BoxDecoration(
++                  color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.6),
++                  borderRadius: BorderRadius.circular(12),
++                  border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
++                ),
++                child: Row(
++                  children: [
++                    CircleAvatar(
++                      radius: 14,
++                      backgroundColor: iconColor.withValues(alpha: 0.15),
++                      child: Text(m['name']![0].toUpperCase(), style: TextStyle(color: iconColor, fontWeight: FontWeight.bold, fontSize: 12)),
++                    ),
++                    const SizedBox(width: 12),
++                    Expanded(child: Text(m['name']!, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: isDark ? Colors.white : const Color(0xFF1E293B)))),
++                    Container(
++                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
++                      decoration: BoxDecoration(color: iconColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
++                      child: Text(m['role']!, style: TextStyle(color: iconColor, fontSize: 10, fontWeight: FontWeight.bold)),
++                    )
++                  ],
++                ),
++              )).toList(),
+             ),
+           ],
+         ),
