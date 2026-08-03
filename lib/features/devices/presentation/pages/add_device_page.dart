@@ -53,31 +53,35 @@ class _AddDevicePageState extends State<AddDevicePage> {
   }
 
   Future<void> _requestPermissions() async {
-    await [
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-      Permission.location,
-    ].request();
-  }
-
-  void _startScan() async {
-    try {
-      _updateStatus("Memeriksa izin Bluetooth & Lokasi...");
-      Map<Permission, PermissionStatus> statuses = await [
+    if (Platform.isAndroid || Platform.isIOS) {
+      await [
         Permission.bluetoothScan,
         Permission.bluetoothConnect,
         Permission.location,
       ].request();
+    }
+  }
 
-      if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
-        _updateStatus("ERROR: Izin Bluetooth ditolak!");
-        return;
-      }
+  void _startScan() async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        _updateStatus("Memeriksa izin Bluetooth & Lokasi...");
+        Map<Permission, PermissionStatus> statuses = await [
+          Permission.bluetoothScan,
+          Permission.bluetoothConnect,
+          Permission.location,
+        ].request();
 
-      bool isLocationOn = await Permission.location.serviceStatus.isEnabled;
-      if (!isLocationOn) {
-        _updateStatus("ERROR: Tolong NYALAKAN LOKASI (GPS) di HP Anda untuk melakukan Scan Bluetooth!");
-        return;
+        if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
+          _updateStatus("ERROR: Izin Bluetooth ditolak!");
+          return;
+        }
+
+        bool isLocationOn = await Permission.location.serviceStatus.isEnabled;
+        if (!isLocationOn) {
+          _updateStatus("ERROR: Tolong NYALAKAN LOKASI (GPS) di HP Anda untuk melakukan Scan Bluetooth!");
+          return;
+        }
       }
 
       final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
@@ -457,43 +461,43 @@ class _AddDevicePageState extends State<AddDevicePage> {
               ),
               
               if (_statusMessage.isNotEmpty)
-                NeumorphicContainer(
-                  margin: const EdgeInsets.symmetric(vertical: 16.0),
-                  padding: const EdgeInsets.all(16),
-                  borderRadius: 16,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (!_isError && !_isSuccess && (_isScanning || _isConnecting || _statusMessage.contains("Menunggu") || _statusMessage.contains("menghubungkan")))
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
+                          padding: EdgeInsets.only(right: 8.0),
                           child: SizedBox(
-                            width: 20, 
-                            height: 20, 
+                            width: 16, 
+                            height: 16, 
                             child: CircularProgressIndicator(strokeWidth: 2)
                           ),
                         )
                       else if (_isError)
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E)),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E), size: 20),
                         )
                       else if (_isSuccess)
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399)),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399), size: 20),
                         )
                       else
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.info_outline_rounded, color: Colors.blue),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.info_outline_rounded, color: Colors.blue, size: 20),
                         ),
-                      Expanded(
+                      Flexible(
                         child: Text(
                           _statusMessage,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.white70 : Colors.black87),
+                            fontWeight: FontWeight.w500,
+                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                           ),
                         ),
                       ),
