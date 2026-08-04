@@ -74,10 +74,13 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.water_drop_rounded,
-                    size: 80,
-                    color: AppColors.primary,
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/icons/png/icon_iot_hydrosense.png',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

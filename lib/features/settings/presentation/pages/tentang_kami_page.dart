@@ -49,22 +49,30 @@ class TentangKamiPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 16),
-                    // Logo Placeholder
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: const Color(0xFF38BDF8).withValues(alpha: 0.1), shape: BoxShape.circle),
-                          child: const Icon(Icons.water_drop_rounded, size: 50, color: Color(0xFF38BDF8)),
+                    // Logo Aplikasi
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.black26 : Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            )
+                          ]
                         ),
-                        const SizedBox(width: 16),
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(color: const Color(0xFF34D399).withValues(alpha: 0.1), shape: BoxShape.circle),
-                          child: const Icon(Icons.eco_rounded, size: 50, color: Color(0xFF34D399)),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/icons/png/icon_iot_hydrosense.png',
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                     Text(

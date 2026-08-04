@@ -212,37 +212,36 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
-          borderRadius: BorderRadius.circular(24),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(isDownloading ? Icons.cloud_download_rounded : Icons.system_update_rounded, size: 48, color: const Color(0xFF38BDF8)),
-            const SizedBox(height: 16),
-            Text(
-              'Versi ${widget.version} Tersedia!',
-              style: TextStyle(
-                fontSize: 20, 
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : const Color(0xFF1E293B)
-              ),
-            ),
-            const SizedBox(height: 16),
-            
-            if (!isDownloading) ...[
-              Container(
-                constraints: const BoxConstraints(maxHeight: 350, minHeight: 120),
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.black.withOpacity(0.2) : Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(isDownloading ? Icons.cloud_download_rounded : Icons.system_update_rounded, size: 48, color: const Color(0xFF38BDF8)),
+              const SizedBox(height: 16),
+              Text(
+                'Versi ${widget.version} Tersedia!',
+                style: TextStyle(
+                  fontSize: 20, 
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF1E293B)
                 ),
-                child: SingleChildScrollView(
+              ),
+              const SizedBox(height: 16),
+              
+              if (!isDownloading) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.black.withOpacity(0.2) : Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: MarkdownBody(
                     data: widget.notes,
                     styleSheet: MarkdownStyleSheet(
@@ -251,7 +250,6 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
                     ),
                   ),
                 ),
-              ),
               const SizedBox(height: 24),
               Row(
                 children: [
@@ -330,6 +328,7 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
             ]
           ],
         ),
+      ),
       ),
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -49,7 +47,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white : const Color(0xFF1E293B),
-                letterSpacing: -0.5,
+                letterSpacing: -0.5
               ),
             ),
             const SizedBox(height: 32),
@@ -69,9 +67,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     decoration: BoxDecoration(color: const Color(0xFF38BDF8).withValues(alpha: 0.1), shape: BoxShape.circle),
                     child: Icon(themeProvider.isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: const Color(0xFF38BDF8)),
                   ),
-                  title: Text('Mode Tampilan', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                  title: Text('Tema', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : const Color(0xFF1E293B))),
                   subtitle: Text(themeProvider.isDarkMode ? 'Gelap' : 'Terang', style: const TextStyle(fontSize: 12)),
-                  activeColor: const Color(0xFF38BDF8),
+                  activeThumbColor: const Color(0xFF38BDF8),
                   value: themeProvider.isDarkMode,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   onChanged: (value) => Provider.of<ThemeProvider>(context, listen: false).toggleTheme(value),

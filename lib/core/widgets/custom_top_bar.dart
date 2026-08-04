@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 import 'neumorphic_container.dart';
 
 class CustomTopBar extends StatelessWidget {
