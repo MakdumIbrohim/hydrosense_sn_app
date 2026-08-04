@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../widgets/modern_division_card.dart';
 
 class TentangKamiPage extends StatelessWidget {
   const TentangKamiPage({super.key});
@@ -188,36 +189,36 @@ class TentangKamiPage extends StatelessWidget {
                   
                   _buildSectionTitle('TIM KAMI', isDark),
                   
-                  _buildModernDivisionCard('1. DPL', isDark, cardColor, Icons.school_rounded, const Color(0xFFA78BFA), [
+                  ModernDivisionCard(title: '1. DPL', isDark: isDark, cardColor: cardColor, icon: Icons.school_rounded, iconColor: const Color(0xFFA78BFA), members: const [
                     {'name': 'Sitti Mukamilah, M.Pd.', 'role': 'DPL 1'},
                     {'name': 'Hoiriyah, S.Kom.', 'role': 'DPL 2'},
                   ]),
                   const SizedBox(height: 12),
-                  _buildModernDivisionCard('2. BPH TEAM', isDark, cardColor, Icons.manage_accounts_rounded, const Color(0xFFF43F5E), [
+                  ModernDivisionCard(title: '2. BPH TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.manage_accounts_rounded, iconColor: const Color(0xFFF43F5E), members: const [
                     {'name': 'Iqbal Asmoro', 'role': 'Kordes'},
                     {'name': 'St Aisyah', 'role': 'Bendahara'},
                     {'name': 'Tamara Adjuah', 'role': 'Sekretaris'},
                   ]),
                   const SizedBox(height: 12),
-                  _buildModernDivisionCard('3. HUMAS TEAM', isDark, cardColor, Icons.campaign_rounded, const Color(0xFFFB923C), [
+                  ModernDivisionCard(title: '3. HUMAS TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.campaign_rounded, iconColor: const Color(0xFFFB923C), members: const [
                     {'name': 'Aydi Sofyan', 'role': 'Pubdekdok'},
                     {'name': 'Muslimah Qurniawati', 'role': 'Pubdekdok'},
                     {'name': 'Fitri Aulia', 'role': 'Publikasi'},
                   ]),
                   const SizedBox(height: 12),
-                  _buildModernDivisionCard('4. GREEN HOUSE TEAM', isDark, cardColor, Icons.eco_rounded, const Color(0xFF34D399), [
+                  ModernDivisionCard(title: '4. GREEN HOUSE TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.eco_rounded, iconColor: const Color(0xFF34D399), members: const [
                     {'name': 'Moh. Al Fredi Subakti', 'role': 'CO'},
                     {'name': 'Nahiri', 'role': 'Team'},
                     {'name': 'Moh Idris', 'role': 'Team'},
                     {'name': 'Willy Alivia Ramadlani', 'role': 'Team'},
                   ]),
                   const SizedBox(height: 12),
-                  _buildModernDivisionCard('5. IMT TEAM', isDark, cardColor, Icons.biotech_rounded, const Color(0xFF38BDF8), [
+                  ModernDivisionCard(title: '5. IMT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.biotech_rounded, iconColor: const Color(0xFF38BDF8), members: const [
                     {'name': 'Siti Aisyah', 'role': 'Team'},
                     {'name': 'Mar\'atul Camilia', 'role': 'Team'},
                   ]),
                   const SizedBox(height: 12),
-                  _buildModernDivisionCard('6. IOT TEAM', isDark, cardColor, Icons.memory_rounded, const Color(0xFFEAB308), [
+                  ModernDivisionCard(title: '6. IOT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.memory_rounded, iconColor: const Color(0xFFEAB308), members: const [
                     {'name': 'Makdum Ibrohim', 'role': 'CO'},
                     {'name': 'Addis Rofik Erlangga', 'role': 'Team'},
                     {'name': 'Dimas Bagas Firmansyah Arifin', 'role': 'Team'},
@@ -345,74 +346,6 @@ class TentangKamiPage extends StatelessWidget {
           SizedBox(width: 90, child: Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600))),
           Expanded(child: Text(value, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF1E293B)))),
         ],
-      ),
-    );
-  }
-
-  Widget _buildModernDivisionCard(String title, bool isDark, Color cardColor, IconData icon, Color iconColor, List<Map<String, String>> members) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: iconColor.withValues(alpha: 0.1), shape: BoxShape.circle),
-                  child: Icon(icon, color: iconColor, size: 20),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Column(
-              children: members.map((m) {
-                String firstChar = m['name']![0].toUpperCase();
-                if (firstChar == '(') firstChar = '?';
-                
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: iconColor.withValues(alpha: 0.15),
-                        child: Text(firstChar, style: TextStyle(color: iconColor, fontWeight: FontWeight.bold, fontSize: 12)),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(child: Text(m['name']!, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: isDark ? Colors.white : const Color(0xFF1E293B)))),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(color: iconColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                        child: Text(m['role']!, style: TextStyle(color: iconColor, fontSize: 10, fontWeight: FontWeight.bold)),
-                      )
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
       ),
     );
   }

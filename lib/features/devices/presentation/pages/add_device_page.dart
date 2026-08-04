@@ -3,7 +3,6 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../../../core/widgets/neumorphic_container.dart';
 
@@ -196,7 +195,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
               
               for (int j = 1; j <= 15; j++) {
                 await Future.delayed(const Duration(seconds: 1));
-                _updateStatus("Mengecek status jaringan (Detik $j/15) " + ("." * (j % 4)));
+                _updateStatus("Mengecek status jaringan (Detik $j/15) ${'.' * (j % 4)}");
                 
                 // Mulai mengecek Firebase setelah detik ke-5
                 if (j >= 5) {
@@ -280,7 +279,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   bool espResponded = false;
                   for (int j = 1; j <= 15; j++) {
                      await Future.delayed(const Duration(seconds: 1));
-                     _updateStatus("Menunggu respons mikro kontroler (Detik $j/15) " + ("." * (j % 4)));
+                     _updateStatus("Menunggu respons mikro kontroler (Detik $j/15) ${'.' * (j % 4)}");
                      
                      try {
                        final checkUrl = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands/reset_wifi.json?_=${DateTime.now().millisecondsSinceEpoch}");

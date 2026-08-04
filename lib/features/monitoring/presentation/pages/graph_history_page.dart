@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/sensor_provider.dart';
 import '../widgets/chart_widget.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class GraphHistoryPage extends StatelessWidget {
   const GraphHistoryPage({super.key});

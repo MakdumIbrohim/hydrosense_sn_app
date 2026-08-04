@@ -7,7 +7,6 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../widgets/neumorphic_container.dart';
 
 class UpdateService {
@@ -239,7 +238,7 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.black.withOpacity(0.2) : Colors.grey.shade100,
+                    color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: MarkdownBody(
@@ -318,7 +317,7 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
                     setState(() { isDownloading = false; });
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: Colors.red.withOpacity(0.1),
+                    backgroundColor: Colors.red.withValues(alpha: 0.1),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),

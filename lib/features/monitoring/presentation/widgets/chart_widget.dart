@@ -22,7 +22,6 @@ class ChartWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     // Buat data default jika histori masih kosong atau terlalu sedikit
     List<FlSpot> spots = [];
@@ -82,8 +81,8 @@ class ChartWidget extends StatelessWidget {
                 height: 200,
                 width: double.infinity,
                 child: Shimmer.fromColors(
-                  baseColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
-                  highlightColor: isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.1),
+                  baseColor: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.05),
+                  highlightColor: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.1),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
