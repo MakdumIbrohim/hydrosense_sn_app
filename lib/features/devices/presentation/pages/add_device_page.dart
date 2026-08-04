@@ -146,21 +146,17 @@ class _AddDevicePageState extends State<AddDevicePage> {
     _updateStatus("Menyiapkan koneksi ke ${device.platformName}...");
 
     try {
-      try { await device.disconnect(); } catch (_) {}
-      await Future.delayed(const Duration(milliseconds: 1000));
+      _updateStatus("Mencoba menghubungkan ke ESP32...");
       
-      _updateStatus("Mencoba menghubungkan (timeout 15 detik)...");
-      await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
-      _updateStatus("Sukses terhubung ke ESP32 secara fisik.");
+      // Langsung connect tanpa disconnect terlebih dahulu
+      await device.connect(
+        autoConnect: false,
+        license: License.nonprofit,
+        timeout: const Duration(seconds: 15),
+      );
       
-      if (Platform.isAndroid) {
-        _updateStatus("Membersihkan cache GATT...");
-        try { await device.clearGattCache(); } catch (_) {}
-      }
+      _updateStatus("Sukses terhubung! Mencari jalur data...");
       
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      _updateStatus("Mencari layanan komunikasi data (Services)...");
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
 
@@ -182,48 +178,56 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 await Future.delayed(const Duration(milliseconds: 300));
               }
               
-              _updateStatus("SUKSES: Kredensial WiFi berhasil dikirim!");
-              _updateStatus("INFO: ESP32 sedang melakukan RESTART...");
-              
-              await Future.delayed(const Duration(seconds: 2));
+              _updateStatus("Data terkirim! ESP32 sedang merestart...");
               try { await device.disconnect(); } catch (_) {}
               
-              _updateStatus("Mikro kontroler memulai ulang. Menghubungkan WiFi...");
               bool isOnline = false;
               String targetSsid = _ssidController.text;
-              final startTime = DateTime.now().millisecondsSinceEpoch;
               
-              for (int j = 1; j <= 15; j++) {
+              // 1. Ambil timestamp lama sebelum verifikasi
+              int oldTimestamp = 0;
+              final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json?_=${DateTime.now().millisecondsSinceEpoch}");
+              try {
+                final req = await HttpClient().getUrl(url);
+                final res = await req.close();
+                if (res.statusCode == 200) {
+                   final body = await res.transform(utf8.decoder).join();
+                   if (body != "null" && body.isNotEmpty) {
+                      oldTimestamp = jsonDecode(body)['timestamp'] ?? 0;
+                   }
+                }
+              } catch (_) {}
+
+              // 2. Mulai proses menunggu ESP32 online (20 detik)
+              for (int j = 1; j <= 20; j++) {
                 await Future.delayed(const Duration(seconds: 1));
-                _updateStatus("Mengecek status jaringan (Detik $j/15) ${'.' * (j % 4)}");
+                _updateStatus("Memverifikasi password & koneksi (Detik $j/20)...");
                 
-                // Mulai mengecek Firebase setelah detik ke-5
                 if (j >= 5) {
                    try {
-                     final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json?_=${DateTime.now().millisecondsSinceEpoch}");
                      final request = await HttpClient().getUrl(url);
                      final response = await request.close();
                      if (response.statusCode == 200) {
                         final body = await response.transform(utf8.decoder).join();
                         if (body != "null" && body.isNotEmpty) {
                           final data = jsonDecode(body);
-                          // Pastikan SSID sama DAN data ini adalah data baru (bukan sisa data lama di database)
-                          if (data['wifi_ssid'] == targetSsid && data['timestamp'] != null) {
-                             if (data['timestamp'] > (startTime - 5000)) {
-                                 isOnline = true;
-                                 break;
-                             }
+                          int newTimestamp = data['timestamp'] ?? 0;
+                          
+                          // Pastikan SSID cocok DAN timestampnya lebih baru dari sisa data lama
+                          if (data['wifi_ssid'] == targetSsid && newTimestamp > oldTimestamp) {
+                             isOnline = true;
+                             break;
                           }
                         }
                      }
-                   } catch (_) {} // abaikan error fetch
+                   } catch (_) {} 
                 }
               }
               
               if (isOnline) {
-                _updateStatus("SUKSES: Mikro kontroler berhasil terhubung ke jaringan '$targetSsid'!");
+                _updateStatus("SUKSES: ESP32 berhasil online di jaringan '$targetSsid'!");
               } else {
-                _updateStatus("GAGAL: Mikro kontroler tidak merespons di jaringan '$targetSsid'. Pastikan Sandi/SSID benar atau alat menyala.");
+                _updateStatus("GAGAL: ESP32 tidak online. Kemungkinan password salah atau WiFi tidak ada internet.");
               }
               
               if (mounted) setState(() => _isConnecting = false);
