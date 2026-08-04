@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../../../../core/constants/team_data.dart';
 import '../widgets/modern_division_card.dart';
+import '../widgets/social_media_card.dart';
 
 class TentangKamiPage extends StatelessWidget {
   const TentangKamiPage({super.key});
@@ -189,109 +191,46 @@ class TentangKamiPage extends StatelessWidget {
                   
                   _buildSectionTitle('TIM KAMI', isDark),
                   
-                  ModernDivisionCard(title: '1. DPL', isDark: isDark, cardColor: cardColor, icon: Icons.school_rounded, iconColor: const Color(0xFFA78BFA), members: const [
-                    {'name': 'Sitti Mukamilah, M.Pd.', 'role': 'DPL 1'},
-                    {'name': 'Hoiriyah, S.Kom.', 'role': 'DPL 2'},
-                  ]),
+                  ModernDivisionCard(title: '1. DPL', isDark: isDark, cardColor: cardColor, icon: Icons.school_rounded, iconColor: const Color(0xFFA78BFA), members: TeamData.dpl),
                   const SizedBox(height: 12),
-                  ModernDivisionCard(title: '2. BPH TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.manage_accounts_rounded, iconColor: const Color(0xFFF43F5E), members: const [
-                    {'name': 'Iqbal Asmoro', 'role': 'Kordes'},
-                    {'name': 'St Aisyah', 'role': 'Bendahara'},
-                    {'name': 'Tamara Adjuah', 'role': 'Sekretaris'},
-                  ]),
+                  ModernDivisionCard(title: '2. BPH TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.manage_accounts_rounded, iconColor: const Color(0xFFF43F5E), members: TeamData.bph),
                   const SizedBox(height: 12),
-                  ModernDivisionCard(title: '3. HUMAS TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.campaign_rounded, iconColor: const Color(0xFFFB923C), members: const [
-                    {'name': 'Aydi Sofyan', 'role': 'Pubdekdok'},
-                    {'name': 'Muslimah Qurniawati', 'role': 'Pubdekdok'},
-                    {'name': 'Fitri Aulia', 'role': 'Publikasi'},
-                  ]),
+                  ModernDivisionCard(title: '3. HUMAS TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.campaign_rounded, iconColor: const Color(0xFFFB923C), members: TeamData.humas),
                   const SizedBox(height: 12),
-                  ModernDivisionCard(title: '4. GREEN HOUSE TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.eco_rounded, iconColor: const Color(0xFF34D399), members: const [
-                    {'name': 'Moh. Al Fredi Subakti', 'role': 'CO'},
-                    {'name': 'Nahiri', 'role': 'Team'},
-                    {'name': 'Moh Idris', 'role': 'Team'},
-                    {'name': 'Willy Alivia Ramadlani', 'role': 'Team'},
-                  ]),
+                  ModernDivisionCard(title: '4. GREEN HOUSE TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.eco_rounded, iconColor: const Color(0xFF34D399), members: TeamData.greenHouse),
                   const SizedBox(height: 12),
-                  ModernDivisionCard(title: '5. IMT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.biotech_rounded, iconColor: const Color(0xFF38BDF8), members: const [
-                    {'name': 'Siti Aisyah', 'role': 'Team'},
-                    {'name': 'Mar\'atul Camilia', 'role': 'Team'},
-                  ]),
+                  ModernDivisionCard(title: '5. IMT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.biotech_rounded, iconColor: const Color(0xFF38BDF8), members: TeamData.imt),
                   const SizedBox(height: 12),
-                  ModernDivisionCard(title: '6. IOT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.memory_rounded, iconColor: const Color(0xFFEAB308), members: const [
-                    {'name': 'Makdum Ibrohim', 'role': 'CO'},
-                    {'name': 'Addis Rofik Erlangga', 'role': 'Team'},
-                    {'name': 'Dimas Bagas Firmansyah Arifin', 'role': 'Team'},
-                    {'name': 'Nabil Qistubillah', 'role': 'Team'},
-                    {'name': 'Fina Nurul Layali', 'role': 'Team'},
-                  ]),
+                  ModernDivisionCard(title: '6. IOT TEAM', isDark: isDark, cardColor: cardColor, icon: Icons.memory_rounded, iconColor: const Color(0xFFEAB308), members: TeamData.iot),
                   const SizedBox(height: 32),
                   
                   // SOSMED BUTTONS
                   _buildSectionTitle('IKUTI PERJALANAN KAMI', isDark),
                   Row(
                     children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFFf09433), Color(0xFFe6683c), Color(0xFFdc2743), Color(0xFFcc2366), Color(0xFFbc1888)],
-                              begin: Alignment.bottomLeft,
-                              end: Alignment.topRight,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [BoxShadow(color: const Color(0xFFdc2743).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
+                      SocialMediaCard(
+                        label: 'Instagram',
+                        icon: FontAwesomeIcons.instagram,
+                        url: 'https://www.instagram.com/kknposko1_sumbernangka?igsh=ZmsyZHphdzN1ejk2',
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFf09433), Color(0xFFe6683c), Color(0xFFdc2743), Color(0xFFcc2366), Color(0xFFbc1888)],
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
                           ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () {
-                                final uri = Uri.parse('https://www.instagram.com/kknposko1_sumbernangka?igsh=ZmsyZHphdzN1ejk2');
-                                launchUrl(uri, mode: LaunchMode.externalApplication);
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 14),
-                                child: Column(
-                                  children: [
-                                    FaIcon(FontAwesomeIcons.instagram, color: Colors.white, size: 28),
-                                    SizedBox(height: 8),
-                                    Text('Instagram', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: const Color(0xFFdc2743).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
                       ),
                       const SizedBox(width: 16),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(16),
-                              onTap: () {
-                                final uri = Uri.parse('https://www.tiktok.com/@kknposko1sumbernangka?_r=1&_t=ZS-98ZS4ddoX2K');
-                                launchUrl(uri, mode: LaunchMode.externalApplication);
-                              },
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 14),
-                                child: Column(
-                                  children: [
-                                    FaIcon(FontAwesomeIcons.tiktok, color: Colors.white, size: 26),
-                                    SizedBox(height: 8),
-                                    Text('TikTok', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
+                      SocialMediaCard(
+                        label: 'TikTok',
+                        icon: FontAwesomeIcons.tiktok,
+                        url: 'https://www.tiktok.com/@kknposko1sumbernangka?_r=1&_t=ZS-98ZS4ddoX2K',
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
                         ),
                       ),
                     ],
