@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../core/constants/app_colors.dart';
 
 class ChartWidget extends StatelessWidget {
@@ -76,75 +77,91 @@ class ChartWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-            SizedBox(
-              height: 200,
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    horizontalInterval: 1,
-                    getDrawingHorizontalLine: (value) => FlLine(
-                      color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
-                      strokeWidth: 1,
-                      dashArray: [5, 5],
+            if (history.isEmpty)
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: Shimmer.fromColors(
+                  baseColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.05),
+                  highlightColor: isDark ? Colors.white.withOpacity(0.15) : Colors.black.withOpacity(0.1),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  titlesData: FlTitlesData(
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), // Sembunyikan sumbu X agar lebih rapi
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: (value, meta) => Text(
-                          value.toInt().toString(),
-                          style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 10),
+                ),
+              )
+            else
+              SizedBox(
+                height: 200,
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      drawVerticalLine: false,
+                      horizontalInterval: 1,
+                      getDrawingHorizontalLine: (value) => FlLine(
+                        color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2),
+                        strokeWidth: 1,
+                        dashArray: [5, 5],
+                      ),
+                    ),
+                    titlesData: FlTitlesData(
+                      rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)), // Sembunyikan sumbu X agar lebih rapi
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 30,
+                          getTitlesWidget: (value, meta) => Text(
+                            value.toInt().toString(),
+                            style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 10),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineTouchData: LineTouchData(
-                    touchTooltipData: LineTouchTooltipData(
-                      getTooltipColor: (touchedSpot) => const Color(0xFF1E293B),
-                      getTooltipItems: (List<LineBarSpot> touchedSpots) {
-                        return touchedSpots.map((touchedSpot) {
-                          return LineTooltipItem(
-                            '${touchedSpot.y.toStringAsFixed(2)} $unit',
-                            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
-                          );
-                        }).toList();
-                      },
-                    ),
-                  ),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: spots,
-                      isCurved: true,
-                      gradient: LinearGradient(
-                        colors: colors,
+                    borderData: FlBorderData(show: false),
+                    lineTouchData: LineTouchData(
+                      touchTooltipData: LineTouchTooltipData(
+                        getTooltipColor: (touchedSpot) => const Color(0xFF1E293B),
+                        getTooltipItems: (List<LineBarSpot> touchedSpots) {
+                          return touchedSpots.map((touchedSpot) {
+                            return LineTooltipItem(
+                              '${touchedSpot.y.toStringAsFixed(2)} $unit',
+                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                            );
+                          }).toList();
+                        },
                       ),
-                      barWidth: 4,
-                      isStrokeCapRound: true,
-                      dotData: const FlDotData(show: false),
-                      belowBarData: BarAreaData(
-                        show: true,
+                    ),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: spots,
+                        isCurved: true,
                         gradient: LinearGradient(
-                          colors: [
-                            colors.first.withValues(alpha: 0.2),
-                            colors.last.withValues(alpha: 0.0),
-                          ],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
+                          colors: colors,
+                        ),
+                        barWidth: 4,
+                        isStrokeCapRound: true,
+                        dotData: const FlDotData(show: false),
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            colors: [
+                              colors.first.withValues(alpha: 0.2),
+                              colors.last.withValues(alpha: 0.0),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),
