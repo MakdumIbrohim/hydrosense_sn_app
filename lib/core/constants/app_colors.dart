@@ -22,4 +22,13 @@ class AppColors {
   static const Color error = Color(0xFFF44336); // Bahaya, pH/EC buruk
   static const Color warning = Color(0xFFFFC107); // Peringatan
   static const Color success = Color(0xFF4CAF50); // Normal/Optimal
+
+  // Warna khusus untuk Neumorphism
+  static const Color neumoBg = Color(0xFFE0E5EC);
+  static const Color neumoShadowLight = Color(0xFFFFFFFF);
+  static const Color neumoShadowDark = Color(0xFFA3B1C6);
+
+  static const Color neumoBgDark = Color(0xFF292D32);
+  static const Color neumoShadowLightDark = Color(0xFF35393F);
+  static const Color neumoShadowDarkDark = Color(0xFF1D1F23);
 }

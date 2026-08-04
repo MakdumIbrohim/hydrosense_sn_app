@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/sensor_provider.dart';
 import '../widgets/chart_widget.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class GraphHistoryPage extends StatelessWidget {
   const GraphHistoryPage({super.key});
@@ -12,7 +11,7 @@ class GraphHistoryPage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       appBar: AppBar(
         title: Text('Riwayat Grafik Sensor', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,

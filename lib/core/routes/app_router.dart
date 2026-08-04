@@ -10,15 +10,15 @@ import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
 import '../../features/settings/presentation/pages/tentang_kami_page.dart';
 import '../../features/settings/presentation/pages/panduan_penggunaan_page.dart';
-import '../../features/onboarding/presentation/pages/onboarding_page.dart';
+import '../../features/onboarding/presentation/pages/splash_page.dart'; // Diganti ke splash screen
 
 import '../../features/devices/presentation/pages/menu_page.dart';
 import '../../features/devices/presentation/pages/device_features_page.dart';
 
 class AppRoutes {
-  static const String onboarding = '/onboarding';
+  static const String splash = '/splash';
   static const String dashboard = '/';
-  static const String graphHistory = '/graphs'; // Route baru
+  static const String graphHistory = '/graphs';
   static const String menu = '/menu';
   static const String settings = '/settings';
   static const String tentangKami = '/settings/tentang-kami';
@@ -33,11 +33,11 @@ class AppRoutes {
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: AppRoutes.onboarding,
+    initialLocation: AppRoutes.splash, // Menjadi splash pertama kali
     routes: [
       GoRoute(
-        path: AppRoutes.onboarding,
-        builder: (context, state) => const OnboardingPage(),
+        path: AppRoutes.splash,
+        builder: (context, state) => const SplashPage(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

@@ -1,0 +1,27 @@
+--- lib/features/monitoring/presentation/pages/dashboard_page.dart
++++ lib/features/monitoring/presentation/pages/dashboard_page.dart
+@@ -10,12 +10,24 @@
+ import '../widgets/skeleton_widget.dart';
+ import '../providers/sensor_provider.dart';
++import '../../../../core/services/update_service.dart';
+ 
+-class DashboardPage extends StatelessWidget {
++class DashboardPage extends StatefulWidget {
+   const DashboardPage({super.key});
+ 
+   @override
++  State<DashboardPage> createState() => _DashboardPageState();
++}
++
++class _DashboardPageState extends State<DashboardPage> {
++  @override
++  void initState() {
++    super.initState();
++    WidgetsBinding.instance.addPostFrameCallback((_) {
++      UpdateService.checkForUpdates(context);
++    });
++  }
++
++  @override
+   Widget build(BuildContext context) {
+     final isDark = Theme.of(context).brightness == Brightness.dark;

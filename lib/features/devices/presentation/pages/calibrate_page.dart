@@ -108,7 +108,7 @@ class _CalibratePageState extends State<CalibratePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       appBar: AppBar(
         title: Text('Kalibrasi TDS', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
 
 class PanduanPenggunaanPage extends StatelessWidget {
   const PanduanPenggunaanPage({super.key});
@@ -6,10 +7,9 @@ class PanduanPenggunaanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       body: SafeArea(
         child: Column(
           children: [
@@ -18,12 +18,8 @@ class PanduanPenggunaanPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 12,
                     child: IconButton(
                       icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       onPressed: () => Navigator.pop(context),
@@ -46,7 +42,6 @@ class PanduanPenggunaanPage extends StatelessWidget {
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
-                    cardColor: cardColor,
                     iconColor: const Color(0xFF34D399),
                     icon: Icons.speed_rounded,
                     title: '1. Membaca Data (Dashboard)',
@@ -61,7 +56,6 @@ class PanduanPenggunaanPage extends StatelessWidget {
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
-                    cardColor: cardColor,
                     iconColor: const Color(0xFFF43F5E),
                     icon: Icons.wifi_off_rounded,
                     title: '2. Mereset WiFi Mikro Kontroler (Penting)',
@@ -75,7 +69,6 @@ class PanduanPenggunaanPage extends StatelessWidget {
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
-                    cardColor: cardColor,
                     iconColor: const Color(0xFF38BDF8),
                     icon: Icons.grid_view_rounded,
                     title: '3. Menyambungkan ke Jaringan Baru',
@@ -91,7 +84,6 @@ class PanduanPenggunaanPage extends StatelessWidget {
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
-                    cardColor: cardColor,
                     iconColor: const Color(0xFF8B5CF6),
                     icon: Icons.memory_rounded,
                     title: '4. Memantau Status Perangkat',
@@ -102,7 +94,6 @@ class PanduanPenggunaanPage extends StatelessWidget {
                   _buildGuideCard(
                     context: context,
                     isDark: isDark,
-                    cardColor: cardColor,
                     iconColor: const Color(0xFFFB923C),
                     icon: Icons.settings_input_component_rounded,
                     title: '5. Mengkalibrasi Sensor',
@@ -126,18 +117,13 @@ class PanduanPenggunaanPage extends StatelessWidget {
   Widget _buildGuideCard({
     required BuildContext context, 
     required bool isDark, 
-    required Color cardColor,
     required Color iconColor,
     required IconData icon, 
     required String title, 
     required String content
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
+    return NeumorphicContainer(
+      borderRadius: 20,
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(

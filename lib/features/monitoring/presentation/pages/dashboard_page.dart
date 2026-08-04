@@ -1,3 +1,4 @@
+import "../../../../core/widgets/neumorphic_container.dart";
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -7,21 +8,35 @@ import '../widgets/sensor_card_widget.dart';
 import '../widgets/chart_widget.dart';
 import '../widgets/skeleton_widget.dart';
 import '../providers/sensor_provider.dart';
+import '../../../../core/services/update_service.dart'; // Import service update
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkForUpdates(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      backgroundColor: isDark ? AppColors.neumoBgDark : AppColors.neumoBg,
       body: SafeArea(
         child: Consumer<SensorProvider>(
           builder: (context, provider, child) {
             if (provider.isLoading && provider.currentData == null) {
-              return _buildSkeletonLoading(isDark);
+              return _buildSkeletonLoading(isDark, provider.connectionMessage);
             }
 
             final data = provider.currentData;
@@ -170,21 +185,28 @@ class DashboardPage extends StatelessWidget {
                       colors: const [Color(0xFF38BDF8), Color(0xFF34D399)],
                     ),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.analytics_rounded),
-                        label: const Text('Lihat Semua Grafik Riwayat Sensor', style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primary,
-                          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    NeumorphicContainer(
+                      borderRadius: 16,
+                      child: InkWell(
+                        onTap: () => context.push('/graphs'),
+                        borderRadius: BorderRadius.circular(16),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.analytics_rounded, color: Color(0xFF1F837B)),
+                              SizedBox(width: 8),
+                              Text(
+                                'Lihat Semua Grafik Riwayat Sensor',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF1F837B),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        onPressed: () {
-                          // Gunakan GoRouter jika Anda memakai go_router
-                          context.push('/graphs'); 
-                        },
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -198,7 +220,7 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSkeletonLoading(bool isDark) {
+  Widget _buildSkeletonLoading(bool isDark, String message) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: Column(
@@ -220,7 +242,35 @@ class DashboardPage extends StatelessWidget {
               const SkeletonWidget(width: 48, height: 48, borderRadius: 12),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 16, height: 16, 
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF38BDF8))
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    message,
+                    style: const TextStyle(
+                      color: Color(0xFF38BDF8),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
           const SkeletonWidget(width: 130, height: 14, borderRadius: 4),
           const SizedBox(height: 16),
           GridView.count(

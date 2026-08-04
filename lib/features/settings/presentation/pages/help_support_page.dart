@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/app_router.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 class HelpSupportPage extends StatelessWidget {
   const HelpSupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       body: SafeArea(
         child: Column(
           children: [
@@ -19,12 +22,8 @@ class HelpSupportPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
               child: Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 12,
                     child: IconButton(
                       icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       onPressed: () => Navigator.pop(context),
@@ -43,19 +42,15 @@ class HelpSupportPage extends StatelessWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 16,
                     child: Material(
                       color: Colors.transparent,
                       child: Column(
                         children: [
                           _buildHelpTile(isDark, Icons.question_answer_rounded, const Color(0xFF38BDF8), 'FAQ', 'Pertanyaan yang sering diajukan', () {}),
                           Divider(height: 1, indent: 64, color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2)),
-                          _buildHelpTile(isDark, Icons.support_agent_rounded, const Color(0xFF34D399), 'Hubungi Kami', 'WhatsApp atau Email CS', () {}),
+                          _buildHelpTile(isDark, Icons.support_agent_rounded, const Color(0xFF34D399), 'Hubungi Kami', 'WhatsApp atau Email Developer', () => _showContactOptions(context, isDark)),
                           Divider(height: 1, indent: 64, color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.2)),
                           _buildHelpTile(isDark, Icons.menu_book_rounded, const Color(0xFFFB923C), 'Panduan Penggunaan', 'Cara menggunakan aplikasi & alat', () => context.push(AppRoutes.panduanPenggunaan)),
                         ],
@@ -65,13 +60,9 @@ class HelpSupportPage extends StatelessWidget {
                   const SizedBox(height: 24),
                   
                   Text('LEGAL', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
-                  const SizedBox(height: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  const SizedBox(height: 16),
+                  NeumorphicContainer(
+                    borderRadius: 16,
                     child: Material(
                       color: Colors.transparent,
                       child: Column(
@@ -89,6 +80,63 @@ class HelpSupportPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _showContactOptions(BuildContext context, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF1E293B) : const Color(0xFFE2E8F0),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(width: 40, height: 4, margin: const EdgeInsets.only(bottom: 24), decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(2))),
+              Text('Hubungi Developer', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+              const SizedBox(height: 24),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: ListTile(
+                  leading: const FaIcon(FontAwesomeIcons.whatsapp, color: Color(0xFF25D366), size: 28),
+                  title: Text('WhatsApp', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                  subtitle: Text('+62 851-7744-8544', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
+                  trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
+                  onTap: () {
+                    final uri = Uri.parse('https://wa.me/6285177448544?text=Halo%20Developer%20HydroSense');
+                    launchUrl(uri, mode: LaunchMode.externalApplication);
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: ListTile(
+                  leading: const Icon(Icons.email_rounded, color: Color(0xFFEA4335), size: 28),
+                  title: Text('Email', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B))),
+                  subtitle: Text('makdumibrohim28@gmail.com', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
+                  trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
+                  onTap: () {
+                    final uri = Uri.parse('mailto:makdumibrohim28@gmail.com?subject=Bantuan%20Aplikasi%20HydroSense');
+                    launchUrl(uri, mode: LaunchMode.externalApplication); // Mode external agar aplikasi Gmail langsung terbuka
+                  },
+                ),
+              ),
+              const SizedBox(height: 100), // Jarak ekstra agar tidak tertutup floating bottom bar
+            ],
+          ),
+        ),
+        ),
+        );
+      }
     );
   }
 

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
 
 class AddDevicePage extends StatefulWidget {
   const AddDevicePage({super.key});
@@ -50,31 +52,35 @@ class _AddDevicePageState extends State<AddDevicePage> {
   }
 
   Future<void> _requestPermissions() async {
-    await [
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-      Permission.location,
-    ].request();
-  }
-
-  void _startScan() async {
-    try {
-      _updateStatus("Memeriksa izin Bluetooth & Lokasi...");
-      Map<Permission, PermissionStatus> statuses = await [
+    if (Platform.isAndroid || Platform.isIOS) {
+      await [
         Permission.bluetoothScan,
         Permission.bluetoothConnect,
         Permission.location,
       ].request();
+    }
+  }
 
-      if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
-        _updateStatus("ERROR: Izin Bluetooth ditolak!");
-        return;
-      }
+  void _startScan() async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS) {
+        _updateStatus("Memeriksa izin Bluetooth & Lokasi...");
+        Map<Permission, PermissionStatus> statuses = await [
+          Permission.bluetoothScan,
+          Permission.bluetoothConnect,
+          Permission.location,
+        ].request();
 
-      bool isLocationOn = await Permission.location.serviceStatus.isEnabled;
-      if (!isLocationOn) {
-        _updateStatus("ERROR: Tolong NYALAKAN LOKASI (GPS) di HP Anda untuk melakukan Scan Bluetooth!");
-        return;
+        if (statuses[Permission.bluetoothScan] == PermissionStatus.denied) {
+          _updateStatus("ERROR: Izin Bluetooth ditolak!");
+          return;
+        }
+
+        bool isLocationOn = await Permission.location.serviceStatus.isEnabled;
+        if (!isLocationOn) {
+          _updateStatus("ERROR: Tolong NYALAKAN LOKASI (GPS) di HP Anda untuk melakukan Scan Bluetooth!");
+          return;
+        }
       }
 
       final state = await FlutterBluePlus.adapterState.first.timeout(const Duration(seconds: 2), onTimeout: () => BluetoothAdapterState.unknown);
@@ -140,21 +146,17 @@ class _AddDevicePageState extends State<AddDevicePage> {
     _updateStatus("Menyiapkan koneksi ke ${device.platformName}...");
 
     try {
-      try { await device.disconnect(); } catch (_) {}
-      await Future.delayed(const Duration(milliseconds: 1000));
+      _updateStatus("Mencoba menghubungkan ke ESP32...");
       
-      _updateStatus("Mencoba menghubungkan (timeout 15 detik)...");
-      await device.connect(autoConnect: false, license: License.nonprofit, timeout: const Duration(seconds: 15));
-      _updateStatus("Sukses terhubung ke ESP32 secara fisik.");
+      // Langsung connect tanpa disconnect terlebih dahulu
+      await device.connect(
+        autoConnect: false,
+        license: License.nonprofit,
+        timeout: const Duration(seconds: 15),
+      );
       
-      if (Platform.isAndroid) {
-        _updateStatus("Membersihkan cache GATT...");
-        try { await device.clearGattCache(); } catch (_) {}
-      }
+      _updateStatus("Sukses terhubung! Mencari jalur data...");
       
-      await Future.delayed(const Duration(milliseconds: 1500));
-      
-      _updateStatus("Mencari layanan komunikasi data (Services)...");
       List<BluetoothService> services = await device.discoverServices();
       bool found = false;
 
@@ -176,48 +178,56 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 await Future.delayed(const Duration(milliseconds: 300));
               }
               
-              _updateStatus("SUKSES: Kredensial WiFi berhasil dikirim!");
-              _updateStatus("INFO: ESP32 sedang melakukan RESTART...");
-              
-              await Future.delayed(const Duration(seconds: 2));
+              _updateStatus("Data terkirim! ESP32 sedang merestart...");
               try { await device.disconnect(); } catch (_) {}
               
-              _updateStatus("Mikro kontroler memulai ulang. Menghubungkan WiFi...");
               bool isOnline = false;
               String targetSsid = _ssidController.text;
-              final startTime = DateTime.now().millisecondsSinceEpoch;
               
-              for (int j = 1; j <= 15; j++) {
+              // 1. Ambil timestamp lama sebelum verifikasi
+              int oldTimestamp = 0;
+              final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json?_=${DateTime.now().millisecondsSinceEpoch}");
+              try {
+                final req = await HttpClient().getUrl(url);
+                final res = await req.close();
+                if (res.statusCode == 200) {
+                   final body = await res.transform(utf8.decoder).join();
+                   if (body != "null" && body.isNotEmpty) {
+                      oldTimestamp = jsonDecode(body)['timestamp'] ?? 0;
+                   }
+                }
+              } catch (_) {}
+
+              // 2. Mulai proses menunggu ESP32 online (20 detik)
+              for (int j = 1; j <= 20; j++) {
                 await Future.delayed(const Duration(seconds: 1));
-                _updateStatus("Mengecek status jaringan (Detik $j/15) " + ("." * (j % 4)));
+                _updateStatus("Memverifikasi password & koneksi (Detik $j/20)...");
                 
-                // Mulai mengecek Firebase setelah detik ke-5
                 if (j >= 5) {
                    try {
-                     final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/current.json?_=${DateTime.now().millisecondsSinceEpoch}");
                      final request = await HttpClient().getUrl(url);
                      final response = await request.close();
                      if (response.statusCode == 200) {
                         final body = await response.transform(utf8.decoder).join();
                         if (body != "null" && body.isNotEmpty) {
                           final data = jsonDecode(body);
-                          // Pastikan SSID sama DAN data ini adalah data baru (bukan sisa data lama di database)
-                          if (data['wifi_ssid'] == targetSsid && data['timestamp'] != null) {
-                             if (data['timestamp'] > (startTime - 5000)) {
-                                 isOnline = true;
-                                 break;
-                             }
+                          int newTimestamp = data['timestamp'] ?? 0;
+                          
+                          // Pastikan SSID cocok DAN timestampnya lebih baru dari sisa data lama
+                          if (data['wifi_ssid'] == targetSsid && newTimestamp > oldTimestamp) {
+                             isOnline = true;
+                             break;
                           }
                         }
                      }
-                   } catch (_) {} // abaikan error fetch
+                   } catch (_) {} 
                 }
               }
               
               if (isOnline) {
-                _updateStatus("SUKSES: Mikro kontroler berhasil terhubung ke jaringan '$targetSsid'!");
+                _updateStatus("SUKSES: ESP32 berhasil online di jaringan '$targetSsid'!");
               } else {
-                _updateStatus("GAGAL: Mikro kontroler tidak merespons di jaringan '$targetSsid'. Pastikan Sandi/SSID benar atau alat menyala.");
+                _updateStatus("GAGAL: ESP32 tidak online. Kemungkinan password salah atau WiFi tidak ada internet.");
               }
               
               if (mounted) setState(() => _isConnecting = false);
@@ -273,7 +283,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
                   bool espResponded = false;
                   for (int j = 1; j <= 15; j++) {
                      await Future.delayed(const Duration(seconds: 1));
-                     _updateStatus("Menunggu respons mikro kontroler (Detik $j/15) " + ("." * (j % 4)));
+                     _updateStatus("Menunggu respons mikro kontroler (Detik $j/15) ${'.' * (j % 4)}");
                      
                      try {
                        final checkUrl = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/commands/reset_wifi.json?_=${DateTime.now().millisecondsSinceEpoch}");
@@ -331,7 +341,7 @@ class _AddDevicePageState extends State<AddDevicePage> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+      
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -341,12 +351,8 @@ class _AddDevicePageState extends State<AddDevicePage> {
               // HEADER
               Row(
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 12,
                     child: IconButton(
                       icon: Icon(Icons.arrow_back_rounded, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                       onPressed: () => Navigator.pop(context),
@@ -362,13 +368,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
               const SizedBox(height: 32),
 
               // Info Box
-              Container(
+              NeumorphicContainer(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
-                ),
+                borderRadius: 16,
                 child: Row(
                   children: [
                     const Icon(Icons.info_outline_rounded, color: Color(0xFF38BDF8)),
@@ -387,125 +389,118 @@ class _AddDevicePageState extends State<AddDevicePage> {
               // Inputs WiFi
               Text('KONEKSI MIKRO KONTROLER', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
               const SizedBox(height: 12),
-              TextField(
-                controller: _ssidController,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Nama WiFi / Hotspot (SSID)',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                  prefixIcon: const Icon(Icons.wifi_rounded, color: Colors.grey),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: TextField(
+                  controller: _ssidController,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Nama WiFi / Hotspot (SSID)',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.wifi_rounded, color: Colors.grey),
+                  ),
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _passController,
-                obscureText: _isObscure,
-                style: TextStyle(color: isDark ? Colors.white : Colors.black),
-                decoration: InputDecoration(
-                  labelText: 'Password WiFi / Hotspot',
-                  labelStyle: const TextStyle(color: Colors.grey),
-                  filled: true,
-                  fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                  prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                      color: Colors.grey,
+              const SizedBox(height: 16),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: TextField(
+                  controller: _passController,
+                  obscureText: _isObscure,
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Password WiFi / Hotspot',
+                    labelStyle: const TextStyle(color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.transparent,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(Icons.lock_rounded, color: Colors.grey),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscure = !_isObscure;
-                      });
-                    },
                   ),
                 ),
               ),
               const SizedBox(height: 24),
               
-              // Tombol Scan
-              Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    if (!_isScanning && !_isConnecting)
-                      BoxShadow(color: const Color(0xFF34D399).withValues(alpha: 0.3), blurRadius: 16, spreadRadius: 2, offset: const Offset(0, 4)),
-                  ],
+              NeumorphicContainer(
+                borderRadius: 16,
+                isPressed: _isScanning || _isConnecting,
+                child: InkWell(
+                  onTap: _isScanning || _isConnecting ? null : _startScan,
                   borderRadius: BorderRadius.circular(16),
-                ),
-                child: ElevatedButton.icon(
-                  onPressed: _isScanning || _isConnecting ? null : _startScan,
-                  icon: _isScanning 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
-                    : const Icon(Icons.bluetooth_searching_rounded),
-                  label: Text(_isScanning ? 'MENCARI...' : 'CARI PERANGKAT BLUETOOTH', style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF34D399),
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade300,
-                    disabledForegroundColor: Colors.grey.shade500,
-                    elevation: 0,
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _isScanning 
+                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Color(0xFF34D399), strokeWidth: 2)) 
+                          : const Icon(Icons.bluetooth_searching_rounded, color: Color(0xFF34D399)),
+                        const SizedBox(width: 8),
+                        Text(
+                          _isScanning ? 'MENCARI...' : 'CARI PERANGKAT BLUETOOTH', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            letterSpacing: 1, 
+                            color: (_isScanning || _isConnecting) ? Colors.grey : const Color(0xFF34D399)
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               
               if (_statusMessage.isNotEmpty)
-                Container(
-                  margin: const EdgeInsets.symmetric(vertical: 16.0),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: _isError 
-                        ? const Color(0xFFF43F5E).withValues(alpha: 0.1) 
-                        : _isSuccess 
-                            ? const Color(0xFF34D399).withValues(alpha: 0.1)
-                            : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: _isError 
-                          ? const Color(0xFFF43F5E).withValues(alpha: 0.3)
-                          : _isSuccess
-                              ? const Color(0xFF34D399).withValues(alpha: 0.3)
-                              : Colors.transparent,
-                    ),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                  ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (!_isError && !_isSuccess && (_isScanning || _isConnecting || _statusMessage.contains("Menunggu") || _statusMessage.contains("menghubungkan")))
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
+                          padding: EdgeInsets.only(right: 8.0),
                           child: SizedBox(
-                            width: 20, 
-                            height: 20, 
+                            width: 16, 
+                            height: 16, 
                             child: CircularProgressIndicator(strokeWidth: 2)
                           ),
                         )
                       else if (_isError)
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E)),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.error_outline_rounded, color: Color(0xFFF43F5E), size: 20),
                         )
                       else if (_isSuccess)
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399)),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.check_circle_outline_rounded, color: Color(0xFF34D399), size: 20),
                         )
                       else
                         const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.info_outline_rounded, color: Colors.blue),
+                          padding: EdgeInsets.only(right: 8.0),
+                          child: Icon(Icons.info_outline_rounded, color: Colors.blue, size: 20),
                         ),
-                      Expanded(
+                      Flexible(
                         child: Text(
                           _statusMessage,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.white70 : Colors.black87),
+                            fontWeight: FontWeight.w500,
+                            color: _isError ? const Color(0xFFF43F5E) : _isSuccess ? const Color(0xFF34D399) : (isDark ? Colors.grey.shade400 : Colors.grey.shade600),
                           ),
                         ),
                       ),
@@ -535,19 +530,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
                       // Cek secara dinamis berdasarkan UUID uniknya
                       final isTarget = r.advertisementData.serviceUuids.any((uuid) => uuid.toString().toLowerCase().contains("5fafc201"));
                       
-                      return Container(
+                      return NeumorphicContainer(
                         margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: isTarget 
-                              ? (isDark ? const Color(0xFF38BDF8).withValues(alpha: 0.1) : const Color(0xFF38BDF8).withValues(alpha: 0.05)) 
-                              : (isDark ? const Color(0xFF1E293B) : Colors.white),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isTarget ? const Color(0xFF38BDF8) : Colors.transparent,
-                            width: 1.5
-                          ),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
-                        ),
+                        borderRadius: 16,
                         child: Material(
                           color: Colors.transparent,
                           child: ListTile(
@@ -584,13 +569,9 @@ class _AddDevicePageState extends State<AddDevicePage> {
               const SizedBox(height: 48),
               Text('PENGATURAN LANJUTAN', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
               const SizedBox(height: 12),
-              Container(
+              NeumorphicContainer(
                 padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF43F5E).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFF43F5E).withValues(alpha: 0.3)),
-                ),
+                borderRadius: 16,
                 child: Row(
                   children: [
                     const Icon(Icons.warning_amber_rounded, color: Color(0xFFF43F5E)),
@@ -605,16 +586,29 @@ class _AddDevicePageState extends State<AddDevicePage> {
                 ),
               ),
               const SizedBox(height: 12),
-              ElevatedButton.icon(
-                onPressed: () => _confirmResetWiFi(context),
-                icon: const Icon(Icons.wifi_off_rounded),
-                label: const Text('RESET WIFI MIKRO KONTROLER', style: TextStyle(fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF43F5E),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              NeumorphicContainer(
+                borderRadius: 16,
+                child: InkWell(
+                  onTap: () => _confirmResetWiFi(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off_rounded, color: Color(0xFFF43F5E)),
+                        SizedBox(width: 8),
+                        Text(
+                          'RESET WIFI MIKRO KONTROLER', 
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold, 
+                            letterSpacing: 1, 
+                            color: Color(0xFFF43F5E)
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
