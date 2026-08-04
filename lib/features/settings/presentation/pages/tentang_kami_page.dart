@@ -147,8 +147,8 @@ class TentangKamiPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildTeamRow('Instansi', 'Universitas Islam Madura', isDark),
-                        _buildTeamRow('Alamat', 'Ponpes Miftahul Hidayah, Dusun Kopao Sumber Nangka, Duko Timur, Larangan, Kab. Pamekasan, Jawa Timur, Indonesia', isDark),
+                        _buildTeamRow('Instansi', 'Ponpes Miftahul Hidayah', isDark),
+                        _buildTeamRow('Alamat', 'Dusun Kopao Sumber Nangka, Duko Timur, Larangan, Kab. Pamekasan, Jawa Timur', isDark),
                         const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
@@ -189,8 +189,8 @@ class TentangKamiPage extends StatelessWidget {
                   _buildSectionTitle('TIM KAMI', isDark),
                   
                   _buildModernDivisionCard('1. DPL', isDark, cardColor, Icons.school_rounded, const Color(0xFFA78BFA), [
-                    {'name': '(Menyusul)', 'role': 'DPL 1'},
-                    {'name': '(Menyusul)', 'role': 'DPL 2'},
+                    {'name': 'Sitti Mukamilah, M.Pd.', 'role': 'DPL 1'},
+                    {'name': 'Hoiriyah, S.Kom.', 'role': 'DPL 2'},
                   ]),
                   const SizedBox(height: 12),
                   _buildModernDivisionCard('2. BPH TEAM', isDark, cardColor, Icons.manage_accounts_rounded, const Color(0xFFF43F5E), [
