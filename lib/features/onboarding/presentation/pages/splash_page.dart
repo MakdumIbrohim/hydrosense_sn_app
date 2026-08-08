@@ -76,7 +76,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                   ),
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/icons/png/icon_iot_hydrosense.png',
+                      'assets/icons/png/icon_iot_hydrosense2.png',
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,
