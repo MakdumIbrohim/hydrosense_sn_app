@@ -50,7 +50,7 @@ class CustomTopBar extends StatelessWidget {
                 width: isHorizontal ? 4 : 24,
                 height: isHorizontal ? 24 : 4,
                 decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade400,
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),

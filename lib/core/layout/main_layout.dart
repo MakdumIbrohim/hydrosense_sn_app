@@ -100,7 +100,7 @@ class _MainLayoutState extends State<MainLayout> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Panel navigasi ini bisa diseret & dilempar (swipe) ke tepi layar lho!', 
+              'Pegang garis grip (di sebelah/atas ini), lalu lempar (swipe) ke tepi layar lho!', 
               style: TextStyle(fontSize: 12, height: 1.4),
             ),
             const SizedBox(height: 12),
@@ -168,9 +168,12 @@ class _MainLayoutState extends State<MainLayout> {
                   ),
                   if (_showDragHint)
                     Positioned(
-                      top: (_alignment == Alignment.topCenter) ? null : -100,
-                      bottom: (_alignment == Alignment.topCenter) ? -100 : null,
-                      left: (_alignment == Alignment.centerRight) ? -240 : 20,
+                      top: (_alignment == Alignment.bottomCenter) ? -110 : 
+                           (_alignment == Alignment.centerLeft || _alignment == Alignment.centerRight) ? -10 : null,
+                      bottom: (_alignment == Alignment.topCenter) ? -110 : null,
+                      left: (_alignment == Alignment.centerRight) ? null : 
+                            (_alignment == Alignment.centerLeft) ? 80 : 0,
+                      right: (_alignment == Alignment.centerRight) ? 80 : null,
                       child: _buildDragHintBubble(),
                     ),
                 ],

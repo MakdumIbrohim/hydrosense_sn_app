@@ -104,6 +104,30 @@ class PanduanPenggunaanPage extends StatelessWidget {
                         '• Masukkan nilai koreksi (K-Value) yang tepat sesuai kondisi kepekatan air.\n'
                         '• Simpan nilai kalibrasi yang baru ke server.',
                   ),
+                  const SizedBox(height: 16),
+                  _buildGuideCard(
+                    context: context,
+                    isDark: isDark,
+                    iconColor: const Color(0xFFF59E0B),
+                    icon: Icons.swipe_rounded,
+                    title: '6. Mengatur Posisi Panel Navigasi',
+                    content: 'Kini panel menu navigasi di bagian bawah aplikasi dapat Anda pindahkan sesuai kenyamanan jari.\n\n'
+                        'Caranya:\n'
+                        'Sentuh pada bagian panel navigasi, lalu ayunkan/lempar (swipe) ke arah kiri, kanan, atau atas layar. Panel akan otomatis menempel di sisi layar tersebut.',
+                  ),
+                  const SizedBox(height: 16),
+                  _buildGuideCard(
+                    context: context,
+                    isDark: isDark,
+                    iconColor: const Color(0xFF10B981),
+                    icon: Icons.system_update_rounded,
+                    title: '7. Memperbarui Aplikasi (Update)',
+                    content: 'Anda tidak perlu repot mencari file aplikasi versi terbaru jika ada perbaikan fitur.\n\n'
+                        'Langkah-langkah:\n'
+                        '• Masuk ke tab "Pengaturan" (Ikon Roda Gigi dipaling kanan panel navigasi).\n'
+                        '• Pilih menu "Pembaruan Aplikasi".\n'
+                        '• Sistem akan otomatis mengecek rilis terbaru. Jika ada pembaruan, klik tombol unduh yang tersedia.',
+                  ),
                   const SizedBox(height: 32),
                 ],
               ),
