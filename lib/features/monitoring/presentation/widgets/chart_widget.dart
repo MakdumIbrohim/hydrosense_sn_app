@@ -9,6 +9,7 @@ class ChartWidget extends StatelessWidget {
   final String unit;
   final IconData icon;
   final List<Color> colors;
+  final bool isMaintenance;
   
   const ChartWidget({
     super.key, 
@@ -17,6 +18,7 @@ class ChartWidget extends StatelessWidget {
     required this.unit,
     required this.icon,
     required this.colors,
+    this.isMaintenance = false,
   });
 
   @override
@@ -35,7 +37,7 @@ class ChartWidget extends StatelessWidget {
 
     final bgColor = isDark ? AppColors.neumoBgDark : AppColors.neumoBg;
 
-    return Container(
+    final chartContainer = Container(
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(20),
@@ -164,6 +166,38 @@ class ChartWidget extends StatelessWidget {
           ],
         ),
       ),
+    );
+
+    if (!isMaintenance) return chartContainer;
+
+    return Stack(
+      children: [
+        Opacity(
+          opacity: 0.3,
+          child: chartContainer,
+        ),
+        Positioned.fill(
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.5), width: 1.5),
+              ),
+              child: const Text(
+                'SEDANG MAINTENANCE',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
