@@ -115,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       subtitle: Text('Versi saat ini: $_version', style: const TextStyle(fontSize: 12)),
                       trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
                       onTap: () {
-                        UpdateService.checkForUpdates(context, manualCheck: true);
+                        context.push(AppRoutes.updateApp);
                       },
                     ),
                   ],

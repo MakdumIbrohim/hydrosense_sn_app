@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -22,6 +23,17 @@ class UpdateService {
     try {
       final PackageInfo info = await PackageInfo.fromPlatform();
       final String currentVersion = info.version; 
+      
+      String expectedAbi = 'universal';
+      if (Platform.isAndroid) {
+        try {
+          final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+          final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          if (androidInfo.supportedAbis.isNotEmpty) {
+            expectedAbi = androidInfo.supportedAbis.first.toLowerCase(); 
+          }
+        } catch (_) {}
+      }
 
       final response = await http.get(
         Uri.parse('https://api.github.com/repos/$_githubRepo/releases/latest'),
@@ -36,12 +48,31 @@ class UpdateService {
         final String updateUrl = data['html_url'];
         
         String apkUrl = updateUrl;
+        String universalUrl = '';
+        
         if (data['assets'] != null && data['assets'].length > 0) {
           for (var asset in data['assets']) {
-            if (asset['name'].toString().endsWith('.apk')) {
-              apkUrl = asset['browser_download_url'];
-              break;
+            String assetName = asset['name'].toString().toLowerCase();
+            
+            if (assetName.contains('universal.apk')) {
+              universalUrl = asset['browser_download_url'];
             }
+            
+            if (assetName.contains(expectedAbi) && assetName.endsWith('.apk')) {
+              apkUrl = asset['browser_download_url'];
+              break; 
+            }
+          }
+          
+          if (apkUrl == updateUrl && universalUrl.isNotEmpty) {
+            apkUrl = universalUrl;
+          } else if (apkUrl == updateUrl) {
+             for (var asset in data['assets']) {
+                if (asset['name'].toString().endsWith('.apk')) {
+                  apkUrl = asset['browser_download_url'];
+                  break;
+                }
+             }
           }
         }
 

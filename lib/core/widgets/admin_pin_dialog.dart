@@ -125,6 +125,10 @@ Future<void> showAdminPinDialog(
                         borderSide: BorderSide.none,
                       ),
                       hintText: '• • • • • •',
+                      hintStyle: TextStyle(
+                        color: isDark ? Colors.white24 : Colors.black26,
+                        letterSpacing: 8,
+                      ),
                       errorText: isError ? 'PIN salah!' : null,
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../layout/main_layout.dart';
 import '../../features/devices/presentation/pages/add_device_page.dart';
 import '../../features/devices/presentation/pages/calibrate_page.dart';
+import '../../features/devices/presentation/pages/calibrate_ph_page.dart';
 import '../../features/devices/presentation/pages/device_list_page.dart';
 import '../../features/monitoring/presentation/pages/dashboard_page.dart';
 import '../../features/monitoring/presentation/pages/graph_history_page.dart'; // Import baru
@@ -10,6 +11,7 @@ import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/help_support_page.dart';
 import '../../features/settings/presentation/pages/tentang_kami_page.dart';
 import '../../features/settings/presentation/pages/panduan_penggunaan_page.dart';
+import '../../features/settings/presentation/pages/update_page.dart';
 import '../../features/onboarding/presentation/pages/splash_page.dart'; // Diganti ke splash screen
 
 import '../../features/devices/presentation/pages/menu_page.dart';
@@ -24,11 +26,13 @@ class AppRoutes {
   static const String tentangKami = '/settings/tentang-kami';
   static const String panduanPenggunaan = '/settings/panduan';
   static const String helpSupport = '/settings/help';
+  static const String updateApp = '/settings/update';
   static const String wifiSetup = '/settings/wifi-setup';
   static const String devices = '/devices';
   static const String addDevice = '/menu/add';
   static String deviceFeatures(String id) => '/devices/$id';
   static String calibrateDevice(String id) => '/devices/$id/calibrate';
+  static String calibratePhDevice(String id) => '/devices/$id/calibrate-ph';
 }
 
 class AppRouter {
@@ -89,6 +93,10 @@ class AppRouter {
                         path: 'calibrate',
                         builder: (context, state) => CalibratePage(id: state.pathParameters['id']!),
                       ),
+                      GoRoute(
+                        path: 'calibrate-ph',
+                        builder: (context, state) => CalibratePhPage(id: state.pathParameters['id']!),
+                      ),
                     ],
                   ),
                 ],
@@ -113,6 +121,10 @@ class AppRouter {
                   GoRoute(
                     path: 'panduan',
                     builder: (context, state) => const PanduanPenggunaanPage(),
+                  ),
+                  GoRoute(
+                    path: 'update',
+                    builder: (context, state) => const UpdatePage(),
                   ),
                 ],
               ),

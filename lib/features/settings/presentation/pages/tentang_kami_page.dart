@@ -5,6 +5,8 @@ import 'package:package_info_plus/package_info_plus.dart';
 import '../../../../core/constants/team_data.dart';
 import '../widgets/modern_division_card.dart';
 import '../widgets/social_media_card.dart';
+import '../../../../core/widgets/neumorphic_container.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class TentangKamiPage extends StatelessWidget {
   const TentangKamiPage({super.key});
@@ -15,7 +17,7 @@ class TentangKamiPage extends StatelessWidget {
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      
+      backgroundColor: isDark ? AppColors.neumoBgDark : AppColors.neumoBg,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -132,20 +134,8 @@ class TentangKamiPage extends StatelessWidget {
                   const SizedBox(height: 32),
 
                   // Card Informasi Umum Spesial
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark 
-                          ? [const Color(0xFF1E293B), const Color(0xFF0F172A)] 
-                          : [Colors.white, Colors.grey.shade50],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(24),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5))],
-                      border: Border.all(color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03)),
-                    ),
+                  NeumorphicContainer(
+                    borderRadius: 24,
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,26 +202,14 @@ class TentangKamiPage extends StatelessWidget {
                         label: 'Instagram',
                         icon: FontAwesomeIcons.instagram,
                         url: 'https://www.instagram.com/kknposko1_sumbernangka?igsh=ZmsyZHphdzN1ejk2',
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFFf09433), Color(0xFFe6683c), Color(0xFFdc2743), Color(0xFFcc2366), Color(0xFFbc1888)],
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [BoxShadow(color: const Color(0xFFdc2743).withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-                        ),
+                        brandColor: const Color(0xFFE1306C),
                       ),
                       const SizedBox(width: 16),
                       SocialMediaCard(
                         label: 'TikTok',
                         icon: FontAwesomeIcons.tiktok,
                         url: 'https://www.tiktok.com/@kknposko1sumbernangka?_r=1&_t=ZS-98ZS4ddoX2K',
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4))],
-                        ),
+                        brandColor: isDark ? Colors.white : Colors.black,
                       ),
                     ],
                   ),

@@ -6,16 +6,16 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../monitoring/presentation/providers/sensor_provider.dart';
 import '../../../monitoring/presentation/widgets/sensor_card_widget.dart';
 
-class CalibratePage extends StatefulWidget {
+class CalibratePhPage extends StatefulWidget {
   final String id;
-  const CalibratePage({super.key, required this.id});
+  const CalibratePhPage({super.key, required this.id});
 
   @override
-  State<CalibratePage> createState() => _CalibratePageState();
+  State<CalibratePhPage> createState() => _CalibratePhPageState();
 }
 
-class _CalibratePageState extends State<CalibratePage> {
-  final TextEditingController _tdsKController = TextEditingController(text: "1.30");
+class _CalibratePhPageState extends State<CalibratePhPage> {
+  final TextEditingController _phOffsetController = TextEditingController(text: "21.34");
   bool _isLoading = false;
 
   String _statusMessage = "";
@@ -40,7 +40,7 @@ class _CalibratePageState extends State<CalibratePage> {
     }
   }
 
-  Future<void> _fetchCurrentKValue() async {
+  Future<void> _fetchCurrentOffset() async {
     setState(() => _isLoading = true);
     try {
       final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/settings.json");
@@ -51,8 +51,8 @@ class _CalibratePageState extends State<CalibratePage> {
         final responseBody = await response.transform(utf8.decoder).join();
         if (responseBody != "null") {
           final data = jsonDecode(responseBody);
-          if (data['tds_k_value'] != null) {
-            _tdsKController.text = data['tds_k_value'].toString();
+          if (data['ph_calibration'] != null) {
+            _phOffsetController.text = data['ph_calibration'].toString();
           }
           if (mounted) setState(() { _statusMessage = ""; _isSuccess = false; _isError = false; });
         }
@@ -67,31 +67,31 @@ class _CalibratePageState extends State<CalibratePage> {
   }
 
   Future<void> _saveCalibration() async {
-    final double? newTds = double.tryParse(_tdsKController.text.replaceAll(',', '.'));
+    final double? newPh = double.tryParse(_phOffsetController.text.replaceAll(',', '.'));
     
-    if (newTds == null || newTds <= 0) {
-      _updateStatus("ERROR: Angka TDS tidak valid!");
+    if (newPh == null) {
+      _updateStatus("ERROR: Angka pH tidak valid!");
       return;
     }
 
     setState(() => _isLoading = true);
     _updateStatus("=============================");
-    _updateStatus("Menyiapkan pembaruan kalibrasi TDS...");
+    _updateStatus("Menyiapkan pembaruan kalibrasi pH...");
     
     try {
       final url = Uri.parse("https://hydrosensesn-default-rtdb.asia-southeast1.firebasedatabase.app/devices/ESP32_01/settings.json");
       final httpClient = HttpClient();
       
-      _updateStatus("Menulis data kalibrasi TDS ke Firebase...");
+      _updateStatus("Menulis data kalibrasi pH ke Firebase...");
       final request = await httpClient.patchUrl(url);
       request.headers.set('Content-Type', 'application/json');
       request.add(utf8.encode(jsonEncode({
-        'tds_k_value': newTds,
+        'ph_calibration': newPh,
       })));
       
       final response = await request.close();
       if (response.statusCode == 200) {
-        _updateStatus("SUKSES: Kalibrasi disimpan! Grafik TDS akan berubah dalam beberapa detik.");
+        _updateStatus("SUKSES: Kalibrasi disimpan! Angka pH akan berubah dalam beberapa detik.");
       } else {
         _updateStatus("GAGAL: Respons server salah (Code: ${response.statusCode})");
       }
@@ -105,7 +105,7 @@ class _CalibratePageState extends State<CalibratePage> {
   @override
   void initState() {
     super.initState();
-    _fetchCurrentKValue();
+    _fetchCurrentOffset();
   }
 
   @override
@@ -114,7 +114,7 @@ class _CalibratePageState extends State<CalibratePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Kalibrasi TDS', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
+        title: Text('Kalibrasi pH', style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: isDark ? Colors.white : Colors.black),
@@ -128,15 +128,15 @@ class _CalibratePageState extends State<CalibratePage> {
               // REAL-TIME MONITORING CARD
               Consumer<SensorProvider>(
                 builder: (context, provider, child) {
-                  final tdsValue = provider.currentData?.tds ?? 0.0;
+                  final phValue = provider.currentData?.ph ?? 0.0;
                   return SizedBox(
                     height: 220,
                     child: SensorCardWidget(
-                      title: 'TDS (Real-Time)',
-                      value: tdsValue.toStringAsFixed(0),
-                      unit: 'ppm',
-                      color: const Color(0xFF38BDF8),
-                      max: 2000,
+                      title: 'pH (Real-Time)',
+                      value: phValue.toStringAsFixed(2),
+                      unit: '',
+                      color: const Color(0xFFA78BFA),
+                      max: 14,
                     ),
                   );
                 },
@@ -146,23 +146,23 @@ class _CalibratePageState extends State<CalibratePage> {
               Container(
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: const Color(0xFFA78BFA).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  border: Border.all(color: const Color(0xFFA78BFA).withValues(alpha: 0.3)),
                 ),
                 child: const Column(
                   children: [
-                    Icon(Icons.tune_rounded, color: AppColors.primary, size: 48),
+                    Icon(Icons.science_rounded, color: Color(0xFFA78BFA), size: 48),
                     SizedBox(height: 16),
-                    Text('Faktor Kalibrasi TDS (K-Value)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Text('Offset Kalibrasi pH', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
-                    Text('Sesuaikan nilai pengali jika hasil pembacaan sensor TDS tidak sesuai dengan TDS meter pabrikan.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text('Sesuaikan nilai offset penambah/pengurang agar hasil pembacaan akurat sesuai cairan pH buffer.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ),
               const SizedBox(height: 32),
               
-              // --- FORM TDS ---
+              // --- FORM PH ---
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -173,17 +173,17 @@ class _CalibratePageState extends State<CalibratePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('K-Value Saat Ini', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
+                    Text('Offset pH Saat Ini', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
                     const SizedBox(height: 12),
                     TextField(
-                      controller: _tdsKController,
+                      controller: _phOffsetController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                        prefixIcon: const Icon(Icons.calculate_rounded, color: Colors.grey),
+                        prefixIcon: const Icon(Icons.water_drop_rounded, color: Colors.grey),
                       ),
                     ),
                   ],
@@ -204,7 +204,7 @@ class _CalibratePageState extends State<CalibratePage> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Tips: Jika TDS di aplikasi terbaca 500 tapi TDS Meter asli 600, maka naikkan K-Value. (Standar pabrik biasanya 1.0 - 1.5).',
+                        'Tips: Jika aplikasi menampilkan pH 6.0 tapi cairan asli adalah pH 7.0, tambahkan 1.0 ke angka di atas.',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.orange.shade200 : Colors.orange.shade900),
                       ),
                     ),
@@ -218,7 +218,7 @@ class _CalibratePageState extends State<CalibratePage> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveCalibration,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary, 
+                    backgroundColor: const Color(0xFFA78BFA), 
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: isDark ? const Color(0xFF1E293B) : Colors.grey.shade300,
                     disabledForegroundColor: Colors.grey.shade500,

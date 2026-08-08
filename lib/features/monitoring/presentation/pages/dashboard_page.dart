@@ -159,7 +159,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       crossAxisSpacing: 16,
                       childAspectRatio: 0.95, // Disesuaikan agar muat dengan gauge
                       children: [
-                        SensorCardWidget(title: 'pH Air', value: data.ph.toStringAsFixed(1), unit: 'pH', min: 0, max: 14, color: const Color(0xFF38BDF8)), // Light Blue
+                        SensorCardWidget(title: 'pH Air', value: data.ph.toStringAsFixed(2), unit: 'pH', min: 0, max: 14, color: const Color(0xFF38BDF8)), // Light Blue
                         SensorCardWidget(title: 'EC Pupuk', value: data.ec.toStringAsFixed(2), unit: 'mS/cm', min: 0, max: 5, color: const Color(0xFF34D399)), // Emerald Green
                         SensorCardWidget(title: 'TDS Nutrisi', value: data.tds.toStringAsFixed(0), unit: 'ppm', min: 0, max: 2000, color: const Color(0xFFA78BFA)), // Purple
                         SensorCardWidget(title: 'Suhu Air', value: data.waterTemperature.toStringAsFixed(1), unit: '°C', min: 0, max: 50, color: const Color(0xFFFB923C)), // Orange
