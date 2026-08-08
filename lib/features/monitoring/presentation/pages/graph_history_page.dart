@@ -30,7 +30,7 @@ class GraphHistoryPage extends StatelessWidget {
             children: [
               ChartWidget(
                 history: provider.ecHistory,
-                title: 'Tren Nutrisi (EC)',
+                title: 'EC (Electrical Conductivity)',
                 unit: 'mS/cm',
                 icon: Icons.show_chart_rounded,
                 colors: const [Color(0xFF38BDF8), Color(0xFF34D399)],
@@ -38,7 +38,7 @@ class GraphHistoryPage extends StatelessWidget {
               const SizedBox(height: 24),
               ChartWidget(
                 history: provider.phHistory,
-                title: 'Tren Keasaman (pH)',
+                title: 'pH (Potential Hydrogen)',
                 unit: 'pH',
                 icon: Icons.science_rounded,
                 colors: const [Color(0xFF8B5CF6), Color(0xFFF43F5E)],
@@ -46,7 +46,7 @@ class GraphHistoryPage extends StatelessWidget {
               const SizedBox(height: 24),
               ChartWidget(
                 history: provider.tdsHistory,
-                title: 'Tren Partikel (TDS)',
+                title: 'TDS (Total Dissolved Solids)',
                 unit: 'ppm',
                 icon: Icons.water_drop_rounded,
                 colors: const [Color(0xFFFBBF24), Color(0xFFFB923C)],
@@ -54,10 +54,11 @@ class GraphHistoryPage extends StatelessWidget {
               const SizedBox(height: 24),
               ChartWidget(
                 history: provider.tempHistory,
-                title: 'Tren Suhu Air',
+                title: 'Suhu Air',
                 unit: '°C',
                 icon: Icons.thermostat_rounded,
                 colors: const [Color(0xFFEF4444), Color(0xFFF59E0B)],
+                isMaintenance: true,
               ),
               const SizedBox(height: 48), // Padding bottom
             ],

@@ -76,7 +76,7 @@ class TentangKamiPage extends StatelessWidget {
                     ),
                     child: ClipOval(
                       child: Image.asset(
-                        'assets/icons/png/icon_iot_hydrosense.png',
+                        'assets/icons/png/icon_iot_hydrosense2.png',
                         width: 120,
                         height: 120,
                         fit: BoxFit.cover,
@@ -216,7 +216,7 @@ class TentangKamiPage extends StatelessWidget {
                   
                   const SizedBox(height: 48),
                   Text(
-                    '© 2026 Tim KKN Desa Sumber Nangka\nDibuat dengan ❤️ untuk Masyarakat',
+                    '© 2026 Tim KKN Desa Sumber Nangka\n Untuk SMP & SMK Sumber Nangka',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey.shade500, fontSize: 12, height: 1.5, fontWeight: FontWeight.w500),
                   ),

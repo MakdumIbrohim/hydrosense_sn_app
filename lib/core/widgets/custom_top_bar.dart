@@ -4,58 +4,86 @@ import 'neumorphic_container.dart';
 class CustomTopBar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onItemTapped;
+  final Axis axis;
 
   const CustomTopBar({
     super.key,
     required this.selectedIndex,
     required this.onItemTapped,
+    this.axis = Axis.horizontal,
   });
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    final isHorizontal = axis == Axis.horizontal;
 
-    return SafeArea(
-      bottom: false,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400), 
-          child: NeumorphicContainer(
-            margin: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
-            borderRadius: 40.0,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavBarItem(
-                  icon: Icons.grid_view_rounded,
-                  isSelected: selectedIndex == 0,
-                  isDark: isDark,
-                  onTap: () => onItemTapped(0),
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: isHorizontal ? 400 : 100,
+        maxHeight: isHorizontal ? 100 : 400,
+      ), 
+        child: NeumorphicContainer(
+          margin: EdgeInsets.only(
+            left: isHorizontal ? 24 : 12, 
+            right: isHorizontal ? 24 : 12, 
+            bottom: isHorizontal ? 24 : 0, 
+            top: isHorizontal ? 8 : 24,
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: isHorizontal ? 16.0 : 6.0, 
+            vertical: isHorizontal ? 6.0 : 16.0,
+          ),
+          borderRadius: 40.0,
+          child: Flex(
+            direction: axis,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // --- DRAG HANDLE INDICATOR ---
+              Container(
+                margin: EdgeInsets.symmetric(
+                  horizontal: isHorizontal ? 4.0 : 0.0,
+                  vertical: isHorizontal ? 0.0 : 4.0,
                 ),
-                _NavBarItem(
-                  icon: Icons.speed_rounded,
-                  isSelected: selectedIndex == 1,
-                  isDark: isDark,
-                  onTap: () => onItemTapped(1),
+                width: isHorizontal ? 4 : 24,
+                height: isHorizontal ? 24 : 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade400,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                _NavBarItem(
-                  icon: Icons.memory_rounded,
-                  isSelected: selectedIndex == 2,
-                  isDark: isDark,
-                  onTap: () => onItemTapped(2),
-                ),
-                _NavBarItem(
-                  icon: Icons.settings_outlined,
-                  isSelected: selectedIndex == 3,
-                  isDark: isDark,
-                  onTap: () => onItemTapped(3),
-                ),
-              ],
-            ),
+              ),
+              if (isHorizontal) const SizedBox(width: 4) else const SizedBox(height: 4),
+              // --- END INDICATOR ---
+              
+              _NavBarItem(
+                icon: Icons.grid_view_rounded,
+                isSelected: selectedIndex == 0,
+                isDark: isDark,
+                onTap: () => onItemTapped(0),
+              ),
+              _NavBarItem(
+                icon: Icons.speed_rounded,
+                isSelected: selectedIndex == 1,
+                isDark: isDark,
+                onTap: () => onItemTapped(1),
+              ),
+              _NavBarItem(
+                icon: Icons.memory_rounded,
+                isSelected: selectedIndex == 2,
+                isDark: isDark,
+                onTap: () => onItemTapped(2),
+              ),
+              _NavBarItem(
+                icon: Icons.settings_outlined,
+                isSelected: selectedIndex == 3,
+                isDark: isDark,
+                onTap: () => onItemTapped(3),
+              ),
+            ],
           ),
         ),
-      ),
     );
   }
 }

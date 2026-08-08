@@ -219,15 +219,15 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
         Navigator.pop(context); // Tutup dialog setelah berhasil
       }
     } catch (e) {
-      if (e is DioException && CancelToken.isCancel(e)) {
-        debugPrint("Download dibatalkan");
+      if (e is DioException && e.type == DioExceptionType.cancel) {
+        debugPrint("Download dibatalkan oleh pengguna");
         return;
       }
       
-      setState(() {
-        isDownloading = false;
-      });
       if (mounted) {
+        setState(() {
+          isDownloading = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal mendownload: $e'), backgroundColor: Colors.red),
         );
