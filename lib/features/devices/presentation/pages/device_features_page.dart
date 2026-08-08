@@ -53,14 +53,10 @@ class DeviceFeaturesPage extends StatelessWidget {
                     _FeatureCard(
                       icon: Icons.science_rounded,
                       title: 'Kalibrasi pH',
-                      subtitle: 'Akan Datang',
+                      subtitle: 'Sesuaikan offset pH',
                       color: const Color(0xFFA78BFA),
                       isDark: isDark,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Fitur Kalibrasi pH segera hadir!')),
-                        );
-                      },
+                      onTap: () => context.push(AppRoutes.calibratePhDevice(id)),
                     ),
                   ],
                 ),
