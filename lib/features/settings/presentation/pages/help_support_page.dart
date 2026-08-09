@@ -111,7 +111,7 @@ class HelpSupportPage extends StatelessWidget {
                   subtitle: Text('+62 851-7744-8544', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
                   trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
                   onTap: () {
-                    final uri = Uri.parse('https://wa.me/6285177448544?text=Halo%20Developer%20HydroSense');
+                    final uri = Uri.parse('https://wa.me/6285177448544?text=Halo%20Developer%20SN%20Hydro');
                     launchUrl(uri, mode: LaunchMode.externalApplication);
                   },
                 ),
@@ -125,7 +125,7 @@ class HelpSupportPage extends StatelessWidget {
                   subtitle: Text('makdumibrohim28@gmail.com', style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade700)),
                   trailing: const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.grey),
                   onTap: () {
-                    final uri = Uri.parse('mailto:makdumibrohim28@gmail.com?subject=Bantuan%20Aplikasi%20HydroSense');
+                    final uri = Uri.parse('mailto:makdumibrohim28@gmail.com?subject=Bantuan%20Aplikasi%20SN%20Hydro');
                     launchUrl(uri, mode: LaunchMode.externalApplication); // Mode external agar aplikasi Gmail langsung terbuka
                   },
                 ),

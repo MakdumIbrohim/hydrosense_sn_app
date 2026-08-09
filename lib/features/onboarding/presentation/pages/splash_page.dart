@@ -86,7 +86,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                 const SizedBox(height: 24),
                 // Nama Aplikasi
                 const Text(
-                  'HydroSense SN',
+                  'SN Hydro',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

@@ -57,7 +57,7 @@ class OnboardingPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'HYDROSENSE',
+                        'SN HYDRO',
                         style: TextStyle(
                           fontSize: 14,
                           letterSpacing: 4,

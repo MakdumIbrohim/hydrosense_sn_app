@@ -57,7 +57,7 @@ class DeviceListPage extends StatelessWidget {
                         _buildDeviceTile(
                           isDark: isDark,
                           cardColor: cardColor,
-                          title: 'HydroSense Node 1',
+                          title: 'SN Hydro Node 1',
                           isOnline: isOnline,
                           onCalibrate: () => _showPinDialog(context, 'esp32-node-1'),
                         ),
