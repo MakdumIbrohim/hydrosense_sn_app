@@ -65,7 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'HydroSense',
+                              'SN Hydro',
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.bold,

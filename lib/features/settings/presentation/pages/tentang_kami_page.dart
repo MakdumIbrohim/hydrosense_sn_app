@@ -90,7 +90,7 @@ class TentangKamiPage extends StatelessWidget {
             
             // APP INFO
             Text(
-              'HydroSense SN',
+              'SN Hydro',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: isDark ? Colors.white : const Color(0xFF1E293B), letterSpacing: -0.5),
             ),
             const SizedBox(height: 8),
@@ -120,7 +120,7 @@ class TentangKamiPage extends StatelessWidget {
                   // Section 1: Deskripsi Luaran KKN
                   _buildSectionTitle('HASIL LUARAN KKN', isDark),
                   _buildBodyText(
-                    'HydroSense SN adalah produk inovasi luaran (output) dari program Kuliah Kerja Nyata (KKN) Universitas Islam Madura Posko 1 yang dilaksanakan di Desa Sumber Nangka. Sistem IoT pintar ini dirancang khusus sebagai pengabdian mahasiswa untuk memajukan sektor pertanian hidroponik lokal melalui teknologi cerdas.',
+                    'SN Hydro adalah produk inovasi luaran (output) dari program Kuliah Kerja Nyata (KKN) Universitas Islam Madura Posko 1 yang dilaksanakan di Desa Sumber Nangka. Sistem IoT pintar ini dirancang khusus sebagai pengabdian mahasiswa untuk memajukan sektor pertanian hidroponik lokal melalui teknologi cerdas.',
                     isDark,
                   ),
                   const SizedBox(height: 32),

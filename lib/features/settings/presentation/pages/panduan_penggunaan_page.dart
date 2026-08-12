@@ -88,7 +88,7 @@ class PanduanPenggunaanPage extends StatelessWidget {
                     icon: Icons.memory_rounded,
                     title: '4. Memantau Status Perangkat',
                     content: 'Untuk melihat mikro kontroler apa saja yang terdaftar di sistem, masuk ke tab "Daftar Perangkat" (Ikon Chip/Memori di bawah).\n\n'
-                        'Di sini Anda bisa memantau apakah mikro kontroler (contoh: HydroSense Node 1) sedang aktif mengirim data (Online/Hijau) atau mati (Offline/Abu-abu).',
+                        'Di sini Anda bisa memantau apakah mikro kontroler (contoh: SN Hydro Node 1) sedang aktif mengirim data (Online/Hijau) atau mati (Offline/Abu-abu).',
                   ),
                   const SizedBox(height: 16),
                   _buildGuideCard(

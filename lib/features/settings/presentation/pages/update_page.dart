@@ -98,7 +98,7 @@ class _UpdatePageState extends State<UpdatePage> {
               
               // Version Info
               Text(
-                'HydroSense SN',
+                'SN Hydro',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 24,
