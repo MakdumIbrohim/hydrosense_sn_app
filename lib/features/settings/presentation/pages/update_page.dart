@@ -244,17 +244,19 @@ class _UpdatePageState extends State<UpdatePage> {
                       const SizedBox(height: 16),
 
                       // Secondary "Not Now" Button
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          foregroundColor: subTextColor,
-                        ),
-                        child: Text(
-                          'Nanti saja',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: subTextColor,
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: Text(
+                            'Nanti saja',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: subTextColor,
+                              decoration: TextDecoration.underline,
+                              decorationColor: subTextColor,
+                            ),
                           ),
                         ),
                       ),
