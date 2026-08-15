@@ -119,18 +119,26 @@ class TentangKamiPage extends StatelessWidget {
                   
                   // Section 1: Deskripsi Luaran KKN
                   _buildSectionTitle('HASIL LUARAN KKN', isDark),
-                  _buildBodyText(
-                    'SN Hydro adalah produk inovasi luaran (output) dari program Kuliah Kerja Nyata (KKN) Universitas Islam Madura Posko 1 yang dilaksanakan di Desa Sumber Nangka. Sistem IoT pintar ini dirancang khusus sebagai pengabdian mahasiswa untuk memajukan sektor pertanian hidroponik lokal melalui teknologi cerdas.',
-                    isDark,
+                  _buildHighlightCard(
+                    icon: Icons.emoji_events_rounded,
+                    iconColor: const Color(0xFFF59E0B),
+                    title: 'Inovasi Berbasis Pengabdian',
+                    description: 'SN Hydro lahir dari program Kuliah Kerja Nyata (KKN) Universitas Islam Madura Posko 1 di Desa Sumber Nangka — sebuah karya nyata mahasiswa untuk masyarakat.',
+                    isDark: isDark,
+                  ),
+                  const SizedBox(height: 12),
+                  _buildHighlightCard(
+                    icon: Icons.sensors_rounded,
+                    iconColor: const Color(0xFF38BDF8),
+                    title: 'Sistem IoT Pertanian Hidroponik',
+                    description: 'Dirancang khusus untuk memajukan sektor pertanian hidroponik lokal menggunakan teknologi pemantauan pintar berbasis Internet of Things (IoT).',
+                    isDark: isDark,
                   ),
                   const SizedBox(height: 32),
 
                   // Section 2: Tujuan
                   _buildSectionTitle('FUNGSI & TUJUAN', isDark),
-                  _buildBodyText(
-                    'Sistem ini mengintegrasikan alat pemantau pH, EC/TDS (Kepekatan Pupuk), dan Suhu Air secara nirkabel. Tujuannya adalah mendigitalisasi pemantauan kualitas air, sehingga warga Desa Sumber Nangka dapat mengontrol hasil panen dengan lebih presisi, efisien, dan terpantau secara real-time dari mana saja.',
-                    isDark,
-                  ),
+                  _buildGoalList(isDark),
                   const SizedBox(height: 32),
 
                   // Card Informasi Umum Spesial
@@ -250,6 +258,119 @@ class TentangKamiPage extends StatelessWidget {
         text,
         textAlign: TextAlign.justify,
         style: TextStyle(fontSize: 14, height: 1.6, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+      ),
+    );
+  }
+
+  Widget _buildHighlightCard({
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String description,
+    required bool isDark,
+  }) {
+    return NeumorphicContainer(
+      borderRadius: 16,
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          NeumorphicContainer(
+            borderRadius: 12,
+            padding: const EdgeInsets.all(10),
+            isPressed: true,
+            child: Icon(icon, color: iconColor, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 13,
+                    height: 1.5,
+                    color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGoalList(bool isDark) {
+    final goals = [
+      (Icons.science_rounded, const Color(0xFF38BDF8), 'Pemantauan pH Air', 'Memastikan tingkat keasaman air selalu ideal untuk pertumbuhan tanaman.'),
+      (Icons.water_rounded, const Color(0xFF34D399), 'Pemantauan EC & TDS', 'Mengukur kepekatan pupuk agar nutrisi tanaman selalu tercukupi secara optimal.'),
+      (Icons.thermostat_rounded, const Color(0xFFFB923C), 'Pemantauan Suhu Air', 'Memantau temperatur air untuk menjaga kondisi tumbuh yang stabil.'),
+      (Icons.phone_android_rounded, const Color(0xFFA78BFA), 'Real-Time dari Mana Saja', 'Warga Sumber Nangka bisa mengontrol hasil panen kapan saja lewat smartphone.'),
+    ];
+
+    return NeumorphicContainer(
+      borderRadius: 16,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: goals.map((g) {
+          final isLast = g == goals.last;
+          return Column(
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  NeumorphicContainer(
+                    borderRadius: 8,
+                    padding: const EdgeInsets.all(6),
+                    isPressed: true,
+                    child: Icon(g.$1, color: g.$2, size: 16),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          g.$3,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF1E293B),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          g.$4,
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            height: 1.5,
+                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (!isLast) ...[
+                const SizedBox(height: 6),
+                Divider(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06), thickness: 1),
+                const SizedBox(height: 6),
+              ],
+            ],
+          );
+        }).toList(),
       ),
     );
   }
