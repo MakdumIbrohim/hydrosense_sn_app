@@ -58,7 +58,6 @@ class GraphHistoryPage extends StatelessWidget {
                 unit: '°C',
                 icon: Icons.thermostat_rounded,
                 colors: const [Color(0xFFEF4444), Color(0xFFF59E0B)],
-                isMaintenance: true,
               ),
               const SizedBox(height: 48), // Padding bottom
             ],
