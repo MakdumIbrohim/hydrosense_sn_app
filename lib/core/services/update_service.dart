@@ -11,6 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:open_filex/open_filex.dart';
 import '../widgets/neumorphic_container.dart';
 
+import '../features/settings/presentation/widgets/update_layout_widget.dart';
+
 class UpdateService {
   static const String _githubRepo = 'MakdumIbrohim/hydrosense_sn_app';
 
@@ -239,230 +241,129 @@ class _DownloadDialogWidgetState extends State<_DownloadDialogWidget> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subTextColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
 
     return Dialog.fullscreen(
-      backgroundColor: bgColor,
-      child: Stack(
-        children: [
-          Positioned(
-            top: -100,
-            right: -100,
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF38BDF8).withValues(alpha: 0.15),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 200,
-            left: -100,
-            child: ImageFiltered(
-              imageFilter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
-              child: Container(
-                width: 250,
-                height: 250,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF34D399).withValues(alpha: 0.15),
-                ),
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      backgroundColor: Colors.transparent, // UpdateLayoutWidget already handles background
+      child: UpdateLayoutWidget(
+        version: widget.version,
+        notes: widget.notes,
+        bottomActionWidget: isDownloading 
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: Image.asset('assets/icons/png/icon_iot_hydrosense2.png', width: 24, height: 24),
-                        ),
+                Text('Mengunduh Pembaruan...', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 12,
+                    backgroundColor: isDark ? Colors.black26 : Colors.black12,
+                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF38BDF8)),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(downloadStats, style: TextStyle(color: subTextColor, fontSize: 13)),
+                    Text(progressString, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(downloadSpeed, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34D399), fontSize: 13)),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: () {
+                      _cancelToken?.cancel("Dibatalkan pengguna");
+                      setState(() { isDownloading = false; });
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.red.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    ),
+                    child: const Text('Batal Mengunduh', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
+                ),
+              ],
+            ) 
+          : Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.security_rounded, color: Color(0xFF34D399), size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Keamanan terverifikasi untuk update di SN Hydro',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: subTextColor,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'SN Hydro',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                InkWell(
+                  onTap: _startDownload,
+                  borderRadius: BorderRadius.circular(30),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF34D399),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF34D399).withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 5),
                         ),
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Update sekarang',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
                       ),
-                    ],
+                    ),
                   ),
                 ),
                 
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    'Temukan versi baru\n${widget.version}',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w900,
-                      height: 1.1,
-                      letterSpacing: -1,
-                      color: textColor,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 32),
-
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: MarkdownBody(
-                      data: widget.notes,
-                      styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(fontSize: 15, color: textColor, height: 1.6, fontWeight: FontWeight.w500),
-                        listBullet: TextStyle(color: textColor, fontSize: 16),
-                        h1: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: textColor),
-                        h2: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: textColor),
-                        h3: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: textColor),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).maybePop(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Nanti saja',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: subTextColor,
+                        decoration: TextDecoration.underline,
+                        decorationColor: subTextColor,
                       ),
                     ),
-                  ),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
-                  child: isDownloading ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Mengunduh Pembaruan...', style: TextStyle(color: textColor, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 16),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          minHeight: 12,
-                          backgroundColor: isDark ? Colors.black26 : Colors.black12,
-                          valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF38BDF8)),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(downloadStats, style: TextStyle(color: subTextColor, fontSize: 13)),
-                          Text(progressString, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: textColor)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(downloadSpeed, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF34D399), fontSize: 13)),
-                      ),
-                      const SizedBox(height: 24),
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: () {
-                            _cancelToken?.cancel("Dibatalkan pengguna");
-                            setState(() { isDownloading = false; });
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor: Colors.red.withValues(alpha: 0.1),
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          ),
-                          child: const Text('Batal Mengunduh', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 16)),
-                        ),
-                      ),
-                    ],
-                  ) : Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.security_rounded, color: Color(0xFF34D399), size: 16),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Keamanan terverifikasi untuk update di SN Hydro',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: subTextColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      InkWell(
-                        onTap: _startDownload,
-                        borderRadius: BorderRadius.circular(30),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF34D399),
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF34D399).withValues(alpha: 0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text(
-                            'Update sekarang',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                      ),
-                      
-                      const SizedBox(height: 16),
-
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        style: TextButton.styleFrom(
-                          foregroundColor: subTextColor,
-                        ),
-                        child: Text(
-                          'Nanti saja',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: subTextColor,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
       ),
     );
   }
