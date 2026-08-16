@@ -88,12 +88,15 @@ class _UpdatePageState extends State<UpdatePage> {
               children: [
                 const Icon(Icons.security_rounded, color: Color(0xFF34D399), size: 16),
                 const SizedBox(width: 8),
-                Text(
-                  'Keamanan terverifikasi untuk update di SN Hydro',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: subTextColor,
+                Flexible(
+                  child: Text(
+                    'Keamanan terverifikasi untuk update di SN Hydro',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: subTextColor,
+                    ),
                   ),
                 ),
               ],
