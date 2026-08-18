@@ -161,7 +161,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         SensorCardWidget(title: 'pH Air', value: data.ph.toStringAsFixed(2), unit: 'pH', min: 0, max: 14, color: const Color(0xFF38BDF8)), // Light Blue
                         SensorCardWidget(title: 'EC', value: data.ec.toStringAsFixed(2), unit: 'mS/cm', min: 0, max: 5, color: const Color(0xFF34D399)), // Emerald Green
-                        SensorCardWidget(title: 'TDS', value: data.tds.toStringAsFixed(2), unit: 'ppm', min: 0, max: 2000, color: const Color(0xFFA78BFA)), // Purple
+                        SensorCardWidget(title: 'TDS', value: data.tds.toStringAsFixed(0), unit: 'ppm', min: 0, max: 2000, color: const Color(0xFFA78BFA)), // Purple
                         SensorCardWidget(
                           title: 'Suhu Air', 
                           value: data.waterTemperature.toStringAsFixed(2), 
