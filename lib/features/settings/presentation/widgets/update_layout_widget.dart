@@ -7,6 +7,7 @@ class UpdateLayoutWidget extends StatelessWidget {
   final String notes;
   final bool isLoadingNotes;
   final Widget bottomActionWidget;
+  final String? titleText;
 
   const UpdateLayoutWidget({
     super.key,
@@ -14,6 +15,7 @@ class UpdateLayoutWidget extends StatelessWidget {
     required this.notes,
     this.isLoadingNotes = false,
     required this.bottomActionWidget,
+    this.titleText,
   });
 
   @override
@@ -99,9 +101,9 @@ class UpdateLayoutWidget extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Text(
-                    'Temukan versi baru\n$version',
+                    titleText ?? 'Temukan versi baru\n$version',
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: 32, // Sedikit dikecilkan agar muat teks panjang
                       fontWeight: FontWeight.w900,
                       height: 1.1,
                       letterSpacing: -1,
