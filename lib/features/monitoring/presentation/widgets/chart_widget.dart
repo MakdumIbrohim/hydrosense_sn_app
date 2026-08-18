@@ -73,7 +73,7 @@ class ChartWidget extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   title,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : const Color(0xFF1E293B)),
                 ),
               ],
             ),
@@ -115,10 +115,10 @@ class ChartWidget extends StatelessWidget {
                       leftTitles: AxisTitles(
                         sideTitles: SideTitles(
                           showTitles: true,
-                          reservedSize: 30,
+                          reservedSize: 35,
                           getTitlesWidget: (value, meta) => Text(
                             value.toInt().toString(),
-                            style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 10),
+                            style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade400, fontSize: 12),
                           ),
                         ),
                       ),
@@ -131,7 +131,7 @@ class ChartWidget extends StatelessWidget {
                           return touchedSpots.map((touchedSpot) {
                             return LineTooltipItem(
                               '${touchedSpot.y.toStringAsFixed(2)} $unit',
-                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                             );
                           }).toList();
                         },
@@ -191,7 +191,7 @@ class ChartWidget extends StatelessWidget {
                   color: Colors.red,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
               ),
             ),
