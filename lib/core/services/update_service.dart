@@ -81,7 +81,7 @@ class UpdateService {
         }
 
         if (context.mounted) {
-          if (_isNewerVersion(currentVersion, latestVersion)) {
+          if (isNewerVersion(currentVersion, latestVersion)) {
             _showUpdateDialog(context, latestVersion, releaseNotes, apkUrl);
           } else if (manualCheck) {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -116,7 +116,7 @@ class UpdateService {
     }
   }
 
-  static bool _isNewerVersion(String current, String latest) {
+  static bool isNewerVersion(String current, String latest) {
     try {
       List<int> c = current.split('.').map(int.parse).toList();
       List<int> l = latest.split('.').map(int.parse).toList();
