@@ -1,12 +1,7 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/services/update_service.dart';
-import '../../../../core/widgets/neumorphic_container.dart';
 
 import '../widgets/update_layout_widget.dart';
 
@@ -18,7 +13,6 @@ class UpdatePage extends StatefulWidget {
 }
 
 class _UpdatePageState extends State<UpdatePage> {
-  String _version = 'Loading...';
   String _latestVersion = 'Loading...';
   String _releaseNotes = 'Sedang mengambil catatan rilis...';
   bool _isLoadingNotes = true;
@@ -26,23 +20,15 @@ class _UpdatePageState extends State<UpdatePage> {
   @override
   void initState() {
     super.initState();
-    _loadAppVersion();
     _fetchReleaseNotes();
-  }
-
-  Future<void> _loadAppVersion() async {
-    final packageInfo = await PackageInfo.fromPlatform();
-    if (mounted) {
-      setState(() {
-        _version = 'v${packageInfo.version}';
-      });
-    }
   }
 
   Future<void> _fetchReleaseNotes() async {
     try {
       final response = await http.get(
-        Uri.parse('https://api.github.com/repos/MakdumIbrohim/hydrosense_sn_app/releases/latest'),
+        Uri.parse(
+          'https://api.github.com/repos/MakdumIbrohim/hydrosense_sn_app/releases/latest',
+        ),
       );
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -56,7 +42,8 @@ class _UpdatePageState extends State<UpdatePage> {
       } else {
         if (mounted) {
           setState(() {
-            _releaseNotes = 'Gagal mengambil catatan rilis (Code: ${response.statusCode})';
+            _releaseNotes =
+                'Gagal mengambil catatan rilis (Code: ${response.statusCode})';
             _isLoadingNotes = false;
           });
         }
@@ -64,7 +51,8 @@ class _UpdatePageState extends State<UpdatePage> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _releaseNotes = 'Terjadi kesalahan jaringan saat mengambil catatan rilis.';
+          _releaseNotes =
+              'Terjadi kesalahan jaringan saat mengambil catatan rilis.';
           _isLoadingNotes = false;
         });
       }
@@ -86,7 +74,11 @@ class _UpdatePageState extends State<UpdatePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.security_rounded, color: Color(0xFF34D399), size: 16),
+                const Icon(
+                  Icons.security_rounded,
+                  color: Color(0xFF34D399),
+                  size: 16,
+                ),
                 const SizedBox(width: 8),
                 Flexible(
                   child: Text(
@@ -134,7 +126,7 @@ class _UpdatePageState extends State<UpdatePage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
 
             GestureDetector(

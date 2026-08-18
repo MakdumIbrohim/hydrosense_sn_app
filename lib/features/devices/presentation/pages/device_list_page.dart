@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/routes/app_router.dart';
-import '../../../../core/services/admin_pin_service.dart';
 import '../../../../core/widgets/admin_pin_dialog.dart';
 import '../../../monitoring/presentation/providers/sensor_provider.dart';
 
@@ -23,7 +22,6 @@ class DeviceListPage extends StatelessWidget {
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
 
     return Scaffold(
-      
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -47,7 +45,9 @@ class DeviceListPage extends StatelessWidget {
                     // Anggap online jika data Firebase ditarik kurang dari 10 detik yang lalu
                     bool isOnline = false;
                     if (data != null) {
-                      isOnline = DateTime.now().difference(data.timestamp).inSeconds < 10;
+                      isOnline =
+                          DateTime.now().difference(data.timestamp).inSeconds <
+                          10;
                     }
 
                     return ListView(
@@ -59,11 +59,12 @@ class DeviceListPage extends StatelessWidget {
                           cardColor: cardColor,
                           title: 'SN Hydro Node 1',
                           isOnline: isOnline,
-                          onCalibrate: () => _showPinDialog(context, 'esp32-node-1'),
+                          onCalibrate: () =>
+                              _showPinDialog(context, 'esp32-node-1'),
                         ),
                       ],
                     );
-                  }
+                  },
                 ),
               ),
             ],
@@ -86,22 +87,31 @@ class DeviceListPage extends StatelessWidget {
         color: Colors.transparent,
         child: ListTile(
           onTap: onCalibrate,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 12,
+          ),
           leading: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isOnline ? const Color(0xFF34D399).withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
+              color: isOnline
+                  ? const Color(0xFF34D399).withValues(alpha: 0.1)
+                  : Colors.grey.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.memory_rounded, 
+              Icons.memory_rounded,
               color: isOnline ? const Color(0xFF34D399) : Colors.grey,
               size: 28,
             ),
           ),
           title: Text(
-            title, 
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : const Color(0xFF1E293B)),
+            title,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+              color: isDark ? Colors.white : const Color(0xFF1E293B),
+            ),
           ),
           subtitle: Row(
             children: [
@@ -111,17 +121,29 @@ class DeviceListPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isOnline ? const Color(0xFF34D399) : Colors.grey,
                   shape: BoxShape.circle,
-                  boxShadow: isOnline ? [const BoxShadow(color: Color(0xFF34D399), blurRadius: 4)] : [],
+                  boxShadow: isOnline
+                      ? [
+                          const BoxShadow(
+                            color: Color(0xFF34D399),
+                            blurRadius: 4,
+                          ),
+                        ]
+                      : [],
                 ),
               ),
               const SizedBox(width: 8),
               Text(
-                isOnline ? 'Online' : 'Offline', 
-                style: TextStyle(color: isOnline ? const Color(0xFF34D399) : Colors.grey),
+                isOnline ? 'Online' : 'Offline',
+                style: TextStyle(
+                  color: isOnline ? const Color(0xFF34D399) : Colors.grey,
+                ),
               ),
             ],
           ),
-          trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
+          trailing: Icon(
+            Icons.chevron_right_rounded,
+            color: Colors.grey.shade400,
+          ),
         ),
       ),
     );
